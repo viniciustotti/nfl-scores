@@ -1,0 +1,89 @@
+/*
+VOICE: placar de estádio — direto, números grandes, sem enfeite.
+IDEA: a faixa de placar da transmissão de TV.
+PICTURE: o card do seu time, grande, no topo, nas cores dele.
+COLOUR and TYPE: fundo neutro + cor do time favorito como destaque; Barlow Condensed em siglas e placares, Inter no texto.
+LAYOUT: coluna única no celular, grid de 2 colunas a partir de 720px.
+*/
+:root{color-scheme:light dark;
+  --bg:light-dark(#eef1f3,#0a1117);--card:light-dark(#ffffff,#121c25);--ink:light-dark(#0d1820,#e7edf1);
+  --muted:light-dark(#5a6a76,#8c9ba7);--line:light-dark(#dbe1e6,#213040);--live:#e0353b;--accent:#69be28;--on-accent:#0a1117}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:1040px;margin:auto;display:flex;align-items:center;gap:10px;padding:8px max(4vw,14px);flex-wrap:wrap}
+.brand{font:700 28px/1 "Barlow Condensed",sans-serif;margin:0;display:flex;align-items:center;gap:8px}
+.brand i{width:12px;height:12px;border-radius:50%;background:var(--accent)}
+.week{display:flex;align-items:center;gap:4px;margin-inline-start:auto}
+.week span{font:600 19px "Barlow Condensed",sans-serif;min-width:8.5em;text-align:center;white-space:nowrap}
+button,select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:44px;cursor:pointer}
+button{min-width:44px;font-size:20px}
+select{padding:0 10px;font-size:16px}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+main{max-width:1040px;margin:auto;padding:16px max(4vw,14px) 48px}
+.notice{border:1px dashed var(--line);border-radius:12px;padding:10px 14px;color:var(--muted);font-size:14px;margin-bottom:14px}
+.notice.err{border-color:var(--live);color:var(--ink)}
+h2{font:600 20px "Barlow Condensed",sans-serif;margin:26px 0 10px;color:var(--muted)}
+.grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.game{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+a.game:hover{border-color:var(--muted)}
+.row{display:flex;align-items:center;gap:10px;padding:4px 0}
+.logo{width:32px;height:32px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 12px "Barlow Condensed",sans-serif;color:#fff;background:var(--tc,#555);object-fit:contain}
+img.logo{background:none}
+.abbr{font:700 22px/1 "Barlow Condensed",sans-serif}
+.rec{color:var(--muted);font-size:13px;white-space:nowrap}
+.poss{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
+.score{margin-inline-start:auto;font:700 30px/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
+.lose{opacity:.5}
+.meta{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-size:13px;color:var(--muted)}
+.meta .tv{margin-inline-start:auto}
+.status{font-weight:600;color:var(--ink);white-space:nowrap}
+.status.live{color:var(--live);display:inline-flex;align-items:center;gap:6px}
+.status.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite}
+@keyframes pulse{50%{opacity:.2}}
+.fav{background:color-mix(in srgb,var(--accent) 15%,var(--card));border:2px solid var(--accent);padding:16px 18px}
+.fav .abbr{font-size:32px}.fav .score{font-size:48px}.fav .logo{width:46px;height:46px;font-size:15px}
+.chip{display:inline-block;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:12px;border-radius:99px;padding:2px 10px;margin-bottom:6px}
+.empty{color:var(--muted);padding:16px 0}
+.sk{height:120px;border-radius:14px;margin-bottom:12px;background:linear-gradient(90deg,var(--card),var(--line),var(--card));background-size:200% 100%;animation:sk 1.2s infinite linear}
+@keyframes sk{to{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.status.live::before,.sk{animation:none}}
+.back{padding:0 14px;margin-bottom:12px;font-size:16px}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;background:color-mix(in srgb,var(--accent) 10%,var(--card));border:1px solid var(--line);border-radius:16px;padding:20px 12px;text-align:center}
+.hero .t{display:grid;justify-items:center;gap:4px}
+.hero .logo{width:58px;height:58px;font-size:18px}
+.hero .abbr{font-size:30px}
+.big{font:700 clamp(40px,11vw,68px)/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums;display:flex;gap:10px;align-items:center;justify-content:center}
+.big i{font-style:normal;color:var(--muted)}
+.mid{display:grid;justify-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:14px}
+.card h3{margin:0 0 6px;font:600 20px "Barlow Condensed",sans-serif}
+.cols{display:grid;gap:0 14px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:820px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500;font-size:13px}
+tr:last-child td{border-bottom:0}
+td b{font-family:"Barlow Condensed",sans-serif;font-size:18px}
+.lead td{white-space:normal;text-align:left;vertical-align:top}
+.lead small{display:block;color:var(--muted)}
+.plays{list-style:none;margin:0;padding:0}
+.plays li{display:grid;grid-template-columns:4.6em minmax(0,1fr) auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.plays li:last-child{border-bottom:0}
+.when{color:var(--muted);font-size:13px;white-space:nowrap}
+.sc{font:700 18px "Barlow Condensed",sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}
+dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0}
+dt{color:var(--muted)}dd{margin:0}
+.foot{color:var(--muted);font-size:13px;margin-top:28px}
+details.card summary{cursor:pointer;list-style:none;min-height:24px}
+details.card summary::-webkit-details-marker{display:none}
+details.card summary h3{display:inline;margin:0}
+details.card summary h3::after{content:" ▾";color:var(--muted);font-size:16px}
+details[open].card summary h3::after{content:" ▴"}
+.drives{margin-top:8px}
+.res{color:var(--muted);font-size:13px;white-space:nowrap;text-align:right}
+.res.scored{color:var(--ink);font-weight:600}
