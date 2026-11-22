@@ -107,6 +107,7 @@ window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(S.timer); else refresh(); });
 installLogoFallback();
 applyAccent(S.fav);
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
 
 (async () => {
   if (/[?&]demo=1\b/.test(location.search) || location.hash === '#demo') { await enableDemo(); S.demo = true; }

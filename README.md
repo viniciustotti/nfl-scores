@@ -25,6 +25,10 @@ js/views/list.js  lista de jogos     js/views/game.js  detalhe do jogo
 js/demo.js        dados de exemplo (só dev)
 ```
 
+## Instalar como app
+
+Android/Chrome: menu → *Instalar app*. iPhone/Safari: Compartilhar → *Adicionar à Tela de Início*. Desktop (Chrome/Edge): ícone de instalar na barra de endereço. O `sw.js` guarda só a casca do site; placares e logos sempre vêm da rede. Ao mudar arquivos do site, aumente `CACHE` em `sw.js` se quiser forçar a limpeza do cache antigo.
+
 ## Dados
 
 API pública e **não oficial** da ESPN (`site.api.espn.com`), chamada direto do navegador (CORS liberado). Pode mudar sem aviso: todo o acesso fica em `js/api.js`. Se o CORS for bloqueado um dia, use o plano B da seção 9 do SPEC (GitHub Action que salva JSON no repo).
