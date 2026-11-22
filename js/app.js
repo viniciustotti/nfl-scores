@@ -8,15 +8,16 @@ const app = $('#app');
 const S = {
   demo: false, fav: store.get('favTeam', 'SEA'),
   week: null, type: null, year: null, games: [], bye: [], loaded: false,
-  view: 'list', gameId: null, detail: null,
+  view: 'list', gameId: null, detail: null, tab: 'game', pteam: null,
   error: false, timer: null, req: 0, fromList: false, listY: 0
 };
 
 // ================= Render =================
 function render({keepScroll = true} = {}){
-  const y = window.scrollY;
+  const y = window.scrollY, k = document.activeElement?.dataset?.k;   // preserva rolagem e foco do teclado
   app.innerHTML = S.view === 'game' ? gameView(S) : listView(S);
   if (keepScroll) window.scrollTo(0, y);   // o polling não pode jogar a página para o topo
+  if (k) app.querySelector(`[data-k="${k}"]`)?.focus({preventScroll: true});
 }
 
 function updWeek(){
@@ -83,7 +84,7 @@ function route(){
   const m = location.hash.match(/^#game-([\w-]+)$/);
   if (m) {
     if (S.view === 'list') S.listY = window.scrollY;
-    S.view = 'game'; S.gameId = m[1]; S.detail = null; S.error = false;
+    S.view = 'game'; S.gameId = m[1]; S.detail = null; S.error = false; S.tab = 'game'; S.pteam = null;
     render({keepScroll: false}); window.scrollTo(0, 0); refresh();
   } else {
     S.view = 'list'; S.detail = null; S.error = false;
@@ -102,6 +103,9 @@ $('#next').addEventListener('click', () => shiftWeek(1));
 app.addEventListener('click', e => {
   if (e.target.closest('#back')) { if (S.fromList) history.back(); else location.hash = ''; }
   if (e.target.closest('a.game')) S.fromList = true;
+  const tb = e.target.closest('[data-tab]'), pt = e.target.closest('[data-pteam]');
+  if (tb) { S.tab = tb.dataset.tab; render(); }
+  if (pt) { S.pteam = pt.dataset.pteam; render(); }
 });
 window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(S.timer); else refresh(); });

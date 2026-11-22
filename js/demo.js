@@ -57,11 +57,21 @@ export const DEMO = (() => {
         return [['firstDowns', ri(14, 26)], ['totalYards', p + ru], ['netPassingYards', p], ['rushingYards', ru],
           ['thirdDownEff', `${ri(3, 7)}-${ri(10, 14)}`], ['turnovers', ri(0, 2)], ['totalPenaltiesYards', `${ri(3, 8)}-${ri(20, 70)}`],
           ['possessionTime', `${ri(26, 33)}:${String(ri(0, 59)).padStart(2, '0')}`]].map(([name, v]) => ({name, displayValue:String(v)})); };
+      const players = ab => { const cat = (name, labels, rows, totals) => ({name, labels, totals,
+          athletes:rows.map((st, i) => ({athlete:{displayName:`${name} ${i + 1} · ${ab}`, jersey:String(ri(1, 99))}, stats:st.map(String)}))});
+        return [cat('passing', ['C/ATT', 'YDS', 'AVG', 'TD', 'INT', 'SACKS', 'QBR', 'RTG'], [[`${ri(15, 26)}/${ri(27, 38)}`, ri(170, 320), '6.8', ri(0, 3), ri(0, 2), '2-14', '55.2', '92.4']], ['20/30', '230', '6.8', '2', '1', '2-14', '--', '92.4']),
+          cat('rushing', ['CAR', 'YDS', 'AVG', 'TD', 'LONG'], [[ri(10, 20), ri(40, 110), '4.1', ri(0, 2), ri(8, 30)], [ri(2, 8), ri(5, 40), '3.2', 0, 9]], ['20', '120', '4.0', '1', '30']),
+          cat('receiving', ['REC', 'YDS', 'AVG', 'TD', 'LONG', 'TGTS'], [[ri(4, 9), ri(50, 120), '11.4', ri(0, 2), ri(15, 40), ri(6, 12)], [ri(2, 6), ri(20, 70), '9.1', 0, 22, 6]], ['14', '170', '11.2', '2', '40', '18']),
+          cat('defensive', ['TOT', 'SOLO', 'SACKS', 'TFL', 'PD', 'QB HTS', 'TD'], [[ri(5, 12), ri(3, 8), ri(0, 2), 1, 0, 1, 0], [ri(3, 8), 2, 0, 0, 1, 0, 0]], ['62', '38', '2', '4', '3', '2', '0']),
+          cat('interceptions', ['INT', 'YDS', 'TD'], [[1, 12, 0]], ['1', '12', '0']),
+          cat('fumbles', ['FUM', 'LOST', 'REC'], [[1, 1, 0]], ['1', '1', '0']),
+          cat('kicking', ['FG', 'PCT', 'LONG', 'XP', 'PTS'], [['2/2', '100.0', '44', '3/3', 9]], ['2/2', '100.0', '44', '3/3', '9']),
+          cat('punting', ['NO', 'YDS', 'AVG', 'TB', 'In 20', 'LONG'], [[3, 140, '46.7', 0, 1, 52]], ['3', '140', '46.7', '0', '1', '52'])]; };
       const teams = c.competitors.map(t => t.team.abbreviation);
       return {
         header:{id, competitions:[{...c, competitors:c.competitors.map(t => ({...t, linescores:ls[t.homeAway].map(v => ({displayValue:String(v)}))}))}]},
         scoringPlays,
-        boxscore:{teams:period ? teams.map(ab => ({team:{abbreviation:ab}, statistics:stats()})) : []},
+        boxscore:{teams:period ? teams.map(ab => ({team:{abbreviation:ab}, statistics:stats()})) : [], players:period ? teams.map(ab => ({team:{abbreviation:ab}, statistics:players(ab)})) : []},
         leaders:period ? teams.map(ab => ({team:{abbreviation:ab}, leaders:[
           {name:'passingYards', leaders:[{athlete:{displayName:`QB · ${ab}`}, displayValue:`${ri(15, 26)}/${ri(27, 38)}, ${ri(170, 320)} jds, ${ri(0, 3)} TD`}]},
           {name:'rushingYards', leaders:[{athlete:{displayName:`RB · ${ab}`}, displayValue:`${ri(10, 24)} corridas, ${ri(40, 130)} jds`}]},

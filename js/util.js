@@ -13,6 +13,9 @@ SEA:['Seahawks','002244','69be28'],TB:['Buccaneers','d50a0a','34302b'],TEN:['Tit
 export const STAT_LABELS = {firstDowns:'First downs',totalYards:'Jardas totais',netPassingYards:'Jardas de passe',rushingYards:'Jardas de corrida',
   thirdDownEff:'3ª descida',turnovers:'Turnovers',totalPenaltiesYards:'Penalidades',possessionTime:'Posse de bola'};
 export const LEADER_CATS = [['passingYards','Passe'],['rushingYards','Corrida'],['receivingYards','Recepção']];
+// Estatísticas por jogador (boxscore.players): [chave ESPN, título]. Retornos de kick/punt ficam de fora.
+export const PLAYER_CATS = [['passing','Passe'],['rushing','Corrida'],['receiving','Recepção'],['defensive','Defesa'],
+  ['interceptions','Interceptações'],['fumbles','Fumbles'],['kicking','Chute'],['punting','Punt']];
 export const POST_WEEKS = {1:'Wild Card',2:'Divisional',3:'Final de conferência',4:'Pro Bowl',5:'Super Bowl'};
 
 // ================= DOM e texto =================

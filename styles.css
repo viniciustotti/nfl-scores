@@ -87,3 +87,12 @@ details[open].card summary h3::after{content:" ▴"}
 .drives{margin-top:8px}
 .res{color:var(--muted);font-size:13px;white-space:nowrap;text-align:right}
 .res.scored{color:var(--ink);font-weight:600}
+
+.tabs,.seg{display:flex;gap:6px;margin-top:14px}
+.tabs button,.seg button{flex:1;font:600 16px Inter,system-ui,sans-serif;min-height:44px}
+.seg{margin-bottom:0}.seg button{font-family:"Barlow Condensed",sans-serif;font-size:20px}
+.tabs button.on,.seg button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.pt th,.pt td{padding:8px 10px}
+.pt td:first-child,.pt th:first-child{position:sticky;left:0;background:var(--card);padding-left:0}
+.pt .num{color:var(--muted);font-size:12px}
+.pt tr.tot td{font-weight:600;border-top:1px solid var(--muted)}

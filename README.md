@@ -1,6 +1,6 @@
 # NFL Scores
 
-Site estático para acompanhar os jogos da NFL: o time favorito (Seahawks por padrão) no topo, lista da semana e detalhes por jogo (placar por quarto, pontuações, líderes, estatísticas e drives). Sem backend, sem chave de API e sem build. Veja [SPEC.md](SPEC.md).
+Site estático para acompanhar os jogos da NFL: o time favorito (Seahawks por padrão) no topo, lista da semana e detalhes por jogo (placar por quarto, pontuações, líderes, estatísticas e drives) e uma aba *Jogadores* com passe, corrida, recepção, defesa (sacks), interceptações, fumbles, chute e punt. Sem backend, sem chave de API e sem build. Veja [SPEC.md](SPEC.md).
 
 ## Rodar localmente
 

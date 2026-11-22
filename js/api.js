@@ -1,6 +1,6 @@
 // Todo o acesso à ESPN (API pública, não oficial) fica aqui e devolve objetos normalizados.
 // Se a ESPN mudar o formato, só este arquivo precisa de ajuste. Caminhos conferidos com respostas reais.
-import {TEAMS, STAT_LABELS, LEADER_CATS} from './util.js';
+import {TEAMS, STAT_LABELS, LEADER_CATS, PLAYER_CATS} from './util.js';
 
 const API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
 
@@ -77,6 +77,19 @@ function normDetail(s, id){
   const leaders = LEADER_CATS.map(([k, label]) => ({label, away: leadOf(g.away.abbr, k), home: leadOf(g.home.abbr, k)}))
     .filter(r => r.away || r.home);
 
+  // Jogadores (aba "Jogadores"): por time, só categorias com gente. Fumbles: só quem teve algum lance.
+  const bp = s.boxscore?.players || [];
+  const playersOf = ab => {
+    const t = bp.find(x => x.team?.abbreviation === ab);
+    return PLAYER_CATS.map(([key, title]) => {
+      const c = t?.statistics?.find(x => x.name === key);
+      let rows = (c?.athletes || []).map(a => ({name: a.athlete?.displayName || '', num: a.athlete?.jersey || '', stats: (a.stats || []).map(String)}));
+      if (key === 'fumbles') rows = rows.filter(r => r.stats.some(v => Number(v) > 0));
+      return rows.length ? {key, title, labels: c.labels || [], rows, totals: (c.totals || []).map(String)} : null;
+    }).filter(Boolean);
+  };
+  const players = {home: playersOf(g.home.abbr), away: playersOf(g.away.abbr)};
+
   // Drives (opcional): mais recente primeiro.
   const dv = [...(s.drives?.previous || []), ...(s.drives?.current ? [s.drives.current] : [])];
   const drives = dv.map(d => ({
@@ -84,7 +97,7 @@ function normDetail(s, id){
     result: d.displayResult || d.result || '', desc: d.description || '', score: !!d.isScore
   })).reverse();
 
-  return {game: g, plays, stats, leaders, drives};
+  return {game: g, plays, stats, leaders, drives, players};
 }
 
 // ================= API pública =================

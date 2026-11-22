@@ -26,8 +26,23 @@ function drivesCard(drives){
     <span class="res${d.score ? ' scored' : ''}">${esc(d.result)}</span></li>`).join('')}</ul></details>`;
 }
 
+// Categorias com linha de total (as demais têm um jogador só ou o total repete a linha).
+const WITH_TOTAL = ['passing', 'rushing', 'receiving', 'defensive'];
+
+function playersView(S, d){
+  const g = d.game, side = sideOf(S, g), cats = d.players[side];
+  const seg = `<div class="seg" role="tablist" aria-label="Time">${['away', 'home'].map(k =>
+    `<button role="tab" data-k="pt-${k}" data-pteam="${k}" aria-selected="${k === side}" class="${k === side ? 'on' : ''}">${esc(g[k].abbr)}</button>`).join('')}</div>`;
+  const tables = cats.map(c => `<div class="card"><h3>${esc(c.title)}</h3><div class="scroll"><table class="pt"><thead><tr><th>Jogador</th>${c.labels.map(l => `<th>${esc(l)}</th>`).join('')}</tr></thead>
+    <tbody>${c.rows.map(r => `<tr><td>${esc(r.name)}${r.num ? ` <span class="num">#${esc(r.num)}</span>` : ''}</td>${r.stats.map(v => `<td>${esc(v)}</td>`).join('')}</tr>`).join('')}
+    ${WITH_TOTAL.includes(c.key) && c.totals.length ? `<tr class="tot"><td>Total</td>${c.totals.map(v => `<td>${esc(v)}</td>`).join('')}</tr>` : ''}</tbody></table></div></div>`).join('');
+  return seg + (tables || '<p class="empty">Sem estatísticas de jogadores ainda.</p>');
+}
+// Time exibido na aba Jogadores: o escolhido; senão o favorito (se joga); senão o visitante.
+const sideOf = (S, g) => S.pteam || (g.home.abbr === S.fav ? 'home' : 'away');
+
 export function gameView(S){
-  const top = `<button class="back" id="back">‹ Voltar</button>` + banner(S);
+  const top = `<button class="back" id="back" data-k="back">‹ Voltar</button>` + banner(S);
   const d = S.detail;
   if (!d) return top + '<div class="sk" style="height:180px"></div><div class="sk"></div>';
   const g = d.game, pre = g.state === 'pre';
@@ -37,6 +52,11 @@ export function gameView(S){
     ${statusHTML(g, true)}${g.state === 'in' && g.dd ? `<span>${esc(g.dd)}</span>` : ''}</div>${heroTeam(g.home, g)}</section>`;
 
   // Antes do jogo: só header, info e records. As seções vazias não aparecem.
+  const hasPlayers = !pre && (d.players.home.length || d.players.away.length);
+  const tab = hasPlayers && S.tab === 'players' ? 'players' : 'game';
+  if (hasPlayers) h += `<div class="tabs" role="tablist">${[['game', 'Jogo'], ['players', 'Jogadores']].map(([k, l]) =>
+    `<button role="tab" data-k="tab-${k}" data-tab="${k}" aria-selected="${k === tab}" class="${k === tab ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  if (tab === 'players') return h + playersView(S, d);
   if (!pre) {
     h += linescore(g);
     if (d.plays.length) h += scoringPlays(d.plays);
