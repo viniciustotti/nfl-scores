@@ -19,6 +19,9 @@ async function getJSON(url){
 }
 
 // ================= Normalização =================
+// Número ou null (nunca NaN).
+const num = v => { const n = Number(v); return v === undefined || v === null || v === '' || !Number.isFinite(n) ? null : n; };
+
 function normTeam(c = {}){
   const t = c.team || {}, st = TEAMS[t.abbreviation] || [];
   const recs = c.records || c.record || [];   // scoreboard: records; summary: record
@@ -27,7 +30,7 @@ function normTeam(c = {}){
     name: t.shortDisplayName || t.name || st[0] || '',
     logo: t.logo || t.logos?.[0]?.href || '',
     color: '#' + (t.color || st[1] || '555555'), alt: '#' + (t.alternateColor || st[2] || 'ffffff'),
-    score: (c.score === undefined || c.score === '') ? null : Number(c.score?.value ?? c.score),
+    score: num(c.score?.value ?? c.score?.displayValue ?? c.score),
     record: recs[0]?.summary || recs[0]?.displayValue || '',
     winner: !!c.winner,
     linescores: (c.linescores || []).map(l => l.displayValue ?? l.value)
@@ -44,7 +47,7 @@ function normGame(ev){
   if (state === 'post' && !home.winner && !away.winner && home.score !== away.score)
     (home.score > away.score ? home : away).winner = true;
   return {
-    id: String(ev.id ?? comp.id), date: new Date(ev.date || comp.date), state,
+    id: String(ev.id ?? comp.id), date: new Date(ev.date || comp.date), state, status: type.name || '',
     detail: type.shortDetail || type.detail || '',
     venue: comp.venue?.fullName || '',
     tv: comp.broadcasts?.[0]?.names?.[0] || comp.broadcasts?.[0]?.media?.shortName || '',

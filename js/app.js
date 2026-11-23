@@ -3,6 +3,7 @@ import {$, TEAMS, POST_WEEKS, store, applyAccent, installLogoFallback} from './u
 import {getScoreboard, getGame, getStandings, enableDemo} from './api.js';
 import {listView} from './views/list.js';
 import {gameView} from './views/game.js';
+import {stepWeek, pollDelay} from './logic.js';
 import {standingsView} from './views/standings.js';
 
 const app = $('#app');
@@ -58,30 +59,21 @@ async function refresh(){
     if (req !== S.req) return;
     S.error = true;
   }
-  render(); schedule();
+  try { render(); } catch (e) { console.error(e); S.error = true; }   // uma falha ao desenhar não pode parar as atualizações
+  schedule();
 }
 
-// 30 s com jogo ao vivo; 5 min se algum jogo começa em até 2 h; 60 s depois de um erro; senão, sem polling.
+// Regras em logic.js (pollDelay); aqui só agenda.
 function schedule(){
   clearTimeout(S.timer);
-  if (document.hidden) return;
-  const list = S.view === 'game' ? (S.detail ? [S.detail.game] : []) : S.view === 'standings' ? [] : S.games, now = Date.now();
-  const ms = S.error ? 60000
-    : list.some(g => g.state === 'in') ? 30000
-    : list.some(g => g.state === 'pre' && g.date - now < 2 * 3600e3 && g.date - now > -3600e3) ? 300000 : 0;
+  const ms = pollDelay({view: S.view, games: S.games, detail: S.detail, error: S.error, hidden: document.hidden, now: Date.now()});
   if (ms) S.timer = setTimeout(refresh, ms);
 }
 
-// Regular 1–18; depois da 18, playoffs (1–5); antes da 1, pré-temporada (1–4).
 function shiftWeek(d){
-  if (!S.week) return;
-  let w = S.week + d, t = S.type;
-  if (t === 2 && w > 18) { t = 3; w = 1; }
-  else if (t === 3 && w < 1) { t = 2; w = 18; }
-  else if (t === 2 && w < 1) { t = 1; w = 4; }
-  else if (t === 1 && w > 4) { t = 2; w = 1; }
-  else if ((t === 3 && w > 5) || (t === 1 && w < 1)) return;
-  S.week = w; S.type = t; S.games = []; S.bye = []; S.loaded = false; S.error = false;
+  const n = stepWeek(S.week, S.type, d);
+  if (!n) return;
+  S.week = n.week; S.type = n.type; S.games = []; S.bye = []; S.loaded = false; S.error = false;
   updWeek();
   if (S.view === 'game') { location.hash = ''; return; }   // o hashchange recarrega a lista
   render(); refresh();
@@ -92,14 +84,14 @@ function route(){
   const m = location.hash.match(/^#game-([\w-]+)$/);
   if (m) {
     if (S.view === 'list') S.listY = window.scrollY;
-    S.view = 'game'; S.gameId = m[1]; S.detail = null; S.error = false; S.tab = 'game'; S.pteam = null;
+    S.view = 'game'; S.gameId = m[1]; S.detail = null; S.error = false; S.updatedAt = null; S.tab = 'game'; S.pteam = null;
     render({keepScroll: false}); window.scrollTo(0, 0); refresh();
   } else if (location.hash === '#standings') {
     if (S.view === 'list') S.listY = window.scrollY;
-    S.view = 'standings'; S.detail = null; S.error = false;
+    S.view = 'standings'; S.detail = null; S.error = false; S.updatedAt = null;
     render({keepScroll: false}); window.scrollTo(0, 0); refresh();
   } else {
-    S.view = 'list'; S.detail = null; S.error = false;
+    S.view = 'list'; S.detail = null; S.error = false; S.updatedAt = null;
     render({keepScroll: false}); window.scrollTo(0, S.listY); refresh();
   }
 }
@@ -126,7 +118,7 @@ window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(S.timer); else refresh(); });
 installLogoFallback();
 applyAccent(S.fav);
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(() => {});
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('./sw.js').catch(e => console.warn('Service worker não registrado:', e));
 
 (async () => {
   if (/[?&]demo=1\b/.test(location.search) || location.hash === '#demo') { await enableDemo(); S.demo = true; }

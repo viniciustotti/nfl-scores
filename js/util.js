@@ -1,3 +1,5 @@
+import {validDate} from './logic.js';
+
 // Helpers: constantes, datas, formatação e pequenas peças de HTML compartilhadas pelas telas.
 
 // ================= Constantes =================
@@ -58,12 +60,21 @@ export function tr(d){
   m = d.match(/^End of (\d)(?:st|nd|rd|th)/i); if (m) return `Fim do ${m[1]}º Q`;
   return d.replace(/\bOT\b/, 'Prorrogação');
 }
+// Situações especiais da ESPN que não são "jogo normal".
+const SPECIAL = {STATUS_POSTPONED: 'Adiado', STATUS_CANCELED: 'Cancelado', STATUS_CANCELLED: 'Cancelado',
+  STATUS_DELAYED: 'Atrasado', STATUS_RAIN_DELAY: 'Atrasado pela chuva', STATUS_SUSPENDED: 'Suspenso', STATUS_FORFEIT: 'W.O.'};
+export const dayLabel = d => validDate(d) ? cap(fmtDay.format(d)) : 'Data a definir';
+export const fullLabel = d => validDate(d) ? cap(fmtFull.format(d)) : 'A definir';
+// Rótulo do período: 1º Q … 4º Q, Prorrog., 2ª prorrog.
+export const periodLabel = q => !q ? '' : q <= 4 ? `${q}º Q` : q === 5 ? 'Prorrog.' : `${q - 4}ª prorrog.`;
 export function statusHTML(g, long){
+  if (SPECIAL[g.status]) return `<span class="status">${SPECIAL[g.status]}</span>`;
   if (g.state === 'in') return `<span class="status live">${esc(tr(g.detail))}</span>`;
   if (g.state === 'post') return `<span class="status">${/OT/.test(g.detail) ? 'Final, prorrogação' : 'Final'}</span>`;
+  if (!validDate(g.date)) return '<span class="status">Horário a definir</span>';
   const diff = g.date - Date.now();
   if (diff > 0 && diff < 2 * 3600e3) return `<span class="status">Começa em ${Math.max(1, Math.round(diff / 6e4))} min</span>`;
-  return `<span class="status">${long ? cap(fmtFull.format(g.date)) : fmtTime.format(g.date)}</span>`;
+  return `<span class="status">${long ? fullLabel(g.date) : fmtTime.format(g.date)}</span>`;
 }
 
 // Cor do texto sobre um fundo de time (escuro ou branco, conforme a luminância) e distância entre duas cores.

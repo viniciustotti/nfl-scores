@@ -1,0 +1,8 @@
+#!/bin/sh
+# Mesmo portão do `npm run validate`: código com teste falhando não sobe.
+# (Escape só em emergência e com o dono sabendo: git push --no-verify.)
+echo "pre-push: rodando npm run validate..."
+if ! npm run validate; then
+  echo "pre-push: testes falharam; push cancelado." >&2
+  exit 1
+fi

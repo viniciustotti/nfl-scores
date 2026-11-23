@@ -26,6 +26,17 @@ js/views/standings.js  tabelas (#standings)
 js/demo.js        dados de exemplo (só dev)
 ```
 
+## Testes
+
+```bash
+npm install      # instala o Playwright e liga o portão do git push
+npm test         # unitários (rápido, sem rede)
+npm run test:e2e # telas no navegador (Playwright), com a ESPN simulada
+npm run validate # os dois; roda sozinho antes de cada git push
+```
+
+Os testes usam respostas reais da ESPN guardadas em `tests/fixtures/`, então não dependem da rede nem do jogo do dia.
+
 ## Instalar como app
 
 Android/Chrome: menu → *Instalar app*. iPhone/Safari: Compartilhar → *Adicionar à Tela de Início*. Desktop (Chrome/Edge): ícone de instalar na barra de endereço. O `sw.js` guarda só a casca do site; placares e logos sempre vêm da rede. Ao mudar arquivos do site, aumente `CACHE` em `sw.js` se quiser forçar a limpeza do cache antigo.

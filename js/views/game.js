@@ -1,5 +1,5 @@
 // Tela de detalhes do jogo (#game-{id}). Recebe o estado e devolve HTML.
-import {esc, cap, fmtFull, statusHTML, logo, loses, banner, textOn, colorDist} from '../util.js';
+import {esc, fullLabel, periodLabel, statusHTML, logo, loses, banner, textOn, colorDist} from '../util.js';
 
 function heroTeam(t, g, cls){
   return `<div class="side ${cls}">${logo(t)}<b class="abbr">${esc(t.abbr)}</b><span class="nm">${esc(t.name)}</span><span class="rc">${esc(t.record)}</span></div>`;
@@ -15,7 +15,7 @@ function hero(g, pre){
 
 function linescore(g){
   const n = Math.max(4, g.home.linescores.length, g.away.linescores.length);
-  const qs = [...Array(n)].map((_, i) => i < 4 ? i + 1 : 'OT');
+  const qs = [...Array(n)].map((_, i) => i < 4 ? i + 1 : i === 4 ? 'OT' : `OT${i - 3}`);
   const line = t => `<tr><td><b>${esc(t.abbr)}</b></td>${qs.map((_, i) => `<td>${esc(t.linescores[i] ?? '–')}</td>`).join('')}<td><b>${t.score ?? 0}</b></td></tr>`;
   return `<div class="card"><h3>Placar por quarto</h3><div class="scroll"><table class="ls"><thead><tr><th>Time</th>${qs.map(q => `<th>${q}</th>`).join('')}<th>T</th></tr></thead>
     <tbody>${line(g.away)}${line(g.home)}</tbody></table></div></div>`;
@@ -23,13 +23,13 @@ function linescore(g){
 
 function scoringPlays(plays){
   return `<div class="card"><h3>Pontuações</h3><ul class="plays">${plays.map(p => `<li>
-    <span class="when">${p.q}º Q ${esc(p.clock)}</span><span><b>${esc(p.team)}</b> ${esc(p.text)}</span>
+    <span class="when">${esc(periodLabel(p.q))} ${esc(p.clock)}</span><span><b>${esc(p.team)}</b> ${esc(p.text)}</span>
     <span class="sc">${esc(p.a)}–${esc(p.h)}</span></li>`).join('')}</ul></div>`;
 }
 
 function drivesCard(drives){
   return `<details class="card"><summary><h3>Drives</h3></summary><ul class="plays drives">${drives.map(d => `<li>
-    <span class="when">${d.q ? d.q + 'º Q ' : ''}${esc(d.clock)}</span><span><b>${esc(d.team)}</b> ${esc(d.desc)}</span>
+    <span class="when">${esc(periodLabel(d.q))} ${esc(d.clock)}</span><span><b>${esc(d.team)}</b> ${esc(d.desc)}</span>
     <span class="res${d.score ? ' scored' : ''}">${esc(d.result)}</span></li>`).join('')}</ul></details>`;
 }
 
@@ -77,6 +77,6 @@ export function gameView(S){
     if (d.drives.length) h += drivesCard(d.drives);
   }
 
-  return h + `<div class="card"><h3>Informações</h3><dl><dt>Início</dt><dd>${cap(fmtFull.format(g.date))}</dd>
+  return h + `<div class="card"><h3>Informações</h3><dl><dt>Início</dt><dd>${esc(fullLabel(g.date))}</dd>
     ${g.venue ? `<dt>Estádio</dt><dd>${esc(g.venue)}</dd>` : ''}${g.tv ? `<dt>Transmissão</dt><dd>${esc(g.tv)}</dd>` : ''}</dl></div>`;
 }

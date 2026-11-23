@@ -1,16 +1,17 @@
 // Tela da lista de jogos: linhas densas (sem cartões); só o jogo do time favorito vira cartão.
-import {TEAMS, esc, cap, fmtDay, statusHTML, logo, loses, banner} from '../util.js';
+import {TEAMS, esc, dayLabel, statusHTML, logo, loses, banner} from '../util.js';
+import {validDate} from '../logic.js';
 
 const isFav = (g, fav) => g.home.abbr === fav || g.away.abbr === fav;
 
 // Ordem: favorito, ao vivo, próximos (por horário), finalizados (do mais recente ao mais antigo).
 export function arrange(games, fav){
-  const rest = games.filter(g => !isFav(g, fav)), byDate = (a, b) => a.date - b.date;
+  const rest = games.filter(g => !isFav(g, fav)), ts = g => validDate(g.date) ? g.date.getTime() : 8.64e15, byDate = (a, b) => ts(a) - ts(b);
   return {
     fav: games.filter(g => isFav(g, fav)),
     live: rest.filter(g => g.state === 'in').sort(byDate),
     pre: rest.filter(g => g.state === 'pre').sort(byDate),
-    post: rest.filter(g => g.state === 'post').sort((a, b) => b.date - a.date)
+    post: rest.filter(g => g.state === 'post').sort((a, b) => ts(b) - ts(a))
   };
 }
 
@@ -32,7 +33,7 @@ function block(title, list, byDay){
   if (!list.length) return '';
   if (!byDay) return `<h2>${title}</h2><div class="rows">${list.map(g => game(g)).join('')}</div>`;
   const days = new Map();
-  list.forEach(g => { const k = cap(fmtDay.format(g.date)); days.has(k) || days.set(k, []); days.get(k).push(g); });
+  list.forEach(g => { const k = dayLabel(g.date); days.has(k) || days.set(k, []); days.get(k).push(g); });
   return `<h2>${title}</h2>` + [...days].map(([d, gs]) => `<h3 class="day">${esc(d)}</h3><div class="rows">${gs.map(g => game(g)).join('')}</div>`).join('');
 }
 

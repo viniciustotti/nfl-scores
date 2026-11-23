@@ -1,0 +1,18 @@
+{
+  "name": "sea-scores",
+  "private": true,
+  "type": "module",
+  "description": "SEA Scores: site estático de placares da NFL (sem build).",
+  "scripts": {
+    "test": "TZ=UTC node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "playwright test",
+    "validate": "npm test && npm run test:e2e",
+    "prepare": "git config core.hooksPath .githooks 2>/dev/null || true"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1"
+  }
+}
