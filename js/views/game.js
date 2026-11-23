@@ -15,7 +15,7 @@ function hero(g, pre){
 
 function linescore(g){
   const n = Math.max(4, g.home.linescores.length, g.away.linescores.length);
-  const qs = [...Array(n)].map((_, i) => i < 4 ? i + 1 : i === 4 ? 'OT' : `OT${i - 3}`);
+  const qs = [...Array(n)].map((_, i) => i < 4 ? i + 1 : periodLabel(i + 1));
   const line = t => `<tr><td><b>${esc(t.abbr)}</b></td>${qs.map((_, i) => `<td>${esc(t.linescores[i] ?? '–')}</td>`).join('')}<td><b>${t.score ?? 0}</b></td></tr>`;
   return `<div class="card"><h3>Placar por quarto</h3><div class="scroll"><table class="ls"><thead><tr><th>Time</th>${qs.map(q => `<th>${q}</th>`).join('')}<th>T</th></tr></thead>
     <tbody>${line(g.away)}${line(g.home)}</tbody></table></div></div>`;

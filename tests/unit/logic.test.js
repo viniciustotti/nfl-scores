@@ -21,9 +21,11 @@ test('stepWeek: pré-temporada e limites', () => {
 test('pollDelay: 30 s com jogo ao vivo', () => {
   assert.equal(pollDelay({games: [game('in', -HOUR), game('pre', 10 * HOUR)], now}), 30e3);
 });
-test('pollDelay: 5 min quando um jogo começa em até 2 h (e até 1 h depois da hora)', () => {
+test('pollDelay: 5 min quando um jogo começa em até 2 h, ou segue "pre" depois da hora (início atrasado, até 12 h)', () => {
   assert.equal(pollDelay({games: [game('pre', 90 * MIN)], now}), 5 * MIN);
   assert.equal(pollDelay({games: [game('pre', -30 * MIN)], now}), 5 * MIN);
+  assert.equal(pollDelay({games: [game('pre', -3 * HOUR)], now}), 5 * MIN, 'atrasado pela chuva: continua atualizando');
+  assert.equal(pollDelay({games: [game('pre', -13 * HOUR)], now}), 0, 'dado velho demais: para de insistir');
 });
 test('pollDelay: com jogos mais adiante, acorda quando a janela de 2 h abre (mín. 1 min, máx. 30 min)', () => {
   assert.equal(pollDelay({games: [game('pre', 2 * HOUR + 10 * MIN)], now}), 10 * MIN);

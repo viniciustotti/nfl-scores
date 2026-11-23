@@ -31,11 +31,11 @@ test('statusHTML: data inválida não lança erro', () => {
   assert.match(statusHTML(g({date: new Date(undefined)})), /Horário a definir/);
   assert.match(statusHTML(g({date: new Date(undefined)}), true), /Horário a definir/);
 });
-test('periodLabel: prorrogação não vira "5º Q" e período ausente não vira "undefined"', () => {
+test('periodLabel: prorrogação (OT, OT2) não vira "5º Q" e período ausente não vira "undefined"', () => {
   assert.equal(periodLabel(1), '1º Q');
   assert.equal(periodLabel(4), '4º Q');
-  assert.equal(periodLabel(5), 'Prorrog.');
-  assert.equal(periodLabel(6), '2ª prorrog.');
+  assert.equal(periodLabel(5), 'OT');
+  assert.equal(periodLabel(6), 'OT2');
   assert.equal(periodLabel(undefined), '');
 });
 test('dayLabel e fullLabel: data inválida vira texto, nunca exceção', () => {

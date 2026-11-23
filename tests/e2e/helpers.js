@@ -12,7 +12,8 @@ export async function mockEspn(page, {scoreboard = fixture('scoreboard'), fail =
   await page.route('**/site.api.espn.com/**', route => {
     const u = route.request().url();
     if (state.fail) return route.abort('failed');
-    if (u.includes('/scoreboard')) { calls.scoreboard++; return json(route, scoreboard); }
+    if (u.includes('/scoreboard')) { calls.scoreboard++; const w = new URL(u).searchParams.get('week');
+      return json(route, w ? {...scoreboard, week: {...scoreboard.week, number: Number(w)}} : scoreboard); }   // devolve a semana pedida
     if (u.includes('/summary')) { calls.summary++; const id = new URL(u).searchParams.get('event');
       const f = {401873071: 'summary-post', 401873078: 'summary-pre'}[id]; return f ? json(route, fixture(f)) : route.fulfill({status: 404, body: '{}'}); }
     if (u.includes('/standings')) { calls.standings++; return json(route, fixture('standings')); }
@@ -24,11 +25,16 @@ export async function mockEspn(page, {scoreboard = fixture('scoreboard'), fail =
   return {calls, state};
 }
 
-// Junta erros de JavaScript e de console (ignora só o erro de rede forçado pelos testes).
+export const ORIGIN = 'http://127.0.0.1:4173';
+
+// Junta erros de JavaScript, de console e qualquer arquivo do próprio site que falhe (404, rede).
+// Só ficam de fora as requisições que os testes bloqueiam de propósito (fontes e ESPN).
 export function watchErrors(page){
   const errors = [];
   page.on('pageerror', e => errors.push('pageerror: ' + e.message));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR/i.test(m.text())) errors.push('console: ' + m.text()); });
+  page.on('response', r => { if (r.url().startsWith(ORIGIN) && r.status() >= 400) errors.push(`HTTP ${r.status()}: ${r.url()}`); });
+  page.on('requestfailed', r => { if (r.url().startsWith(ORIGIN)) errors.push(`falhou: ${r.url()}`); });
   return errors;
 }
 

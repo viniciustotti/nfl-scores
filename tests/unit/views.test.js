@@ -79,12 +79,12 @@ test('detalhe: aba Jogadores mostra as tabelas do time escolhido', async () => {
   assert.match(html, /data-pteam="home" aria-selected="true"/);
   assert.match(html, /Total/);
 });
-test('detalhe: prorrogação aparece como OT e Prorrog., nunca "5º Q" nem "undefined"', async () => {
+test('detalhe: prorrogação aparece como OT no cabeçalho e na jogada, nunca "5º Q" nem "undefined"', async () => {
   const s = clone(fixture('summary-post'));
   s.header.competitions[0].competitors.forEach(c => c.linescores.push({displayValue: '3'}));
   s.scoringPlays.push({...s.scoringPlays[0], period: {number: 5}}, {...s.scoringPlays[0], period: undefined});
   const html = gameView(await gameState(s));
-  assert.match(html, /<th>OT<\/th>/); assert.match(html, /Prorrog\. /);
+  assert.match(html, /<th>OT<\/th>/); assert.match(html, /<span class="when">OT /);
   assert.doesNotMatch(html, /5º Q/); assert.doesNotMatch(html, /undefined/);
 });
 test('detalhe: duas prorrogações viram OT e OT2', async () => {

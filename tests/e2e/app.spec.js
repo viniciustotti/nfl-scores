@@ -74,12 +74,17 @@ test('classificação: divisões, favorito destacado, conferência com linha de 
   expect(errors).toEqual([]);
 });
 
-test('troca de semana pede a semana certa e a lista volta a carregar', async ({page}) => {
+test('troca de semana: pede a semana, a temporada e o ano certos, e a lista volta a carregar', async ({page}) => {
   const urls = []; await mockEspn(page);
-  page.on('request', r => { if (r.url().includes('/scoreboard')) urls.push(r.url()); });
+  page.on('request', r => { if (r.url().includes('site.api.espn.com') && r.url().includes('/scoreboard')) urls.push(r.url()); });
   await page.goto('/');
+  await expect(page.locator('#wk')).toHaveText('Semana 11');
   await page.locator('#prev').click();
-  await expect.poll(() => urls.some(u => /week=10/.test(u))).toBe(true);
+  await expect(page.locator('#wk')).toHaveText('Semana 10');
+  await expect(page.locator('a.g')).toHaveCount(4);
+  expect(urls.at(-1)).toMatch(/seasontype=2&week=10&dates=2026$/);
+  await page.locator('#next').click();
+  await expect(page.locator('#wk')).toHaveText('Semana 11');
 });
 
 test('erro de rede: banner de erro e nenhum dado inventado', async ({page}) => {

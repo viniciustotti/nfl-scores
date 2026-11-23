@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync, existsSync, readdirSync, statSync} from 'node:fs';
 import {join, dirname, resolve} from 'node:path';
 import {fileURLToPath} from 'node:url';
+import vm from 'node:vm';
 
 const root = fileURLToPath(new URL('../..', import.meta.url));
 const read = p => readFileSync(join(root, p), 'utf8');
@@ -13,10 +14,29 @@ test('service worker: tudo que ele guarda na instalação existe de verdade', ()
   assert.ok(shell.length > 10);
   for (const f of shell) { const p = f === './' ? 'index.html' : f.replace(/^\.\//, ''); assert.ok(existsSync(join(root, p)), `SHELL aponta para arquivo inexistente: ${f}`); }
 });
-test('service worker: escrita no cache estende a vida do worker e a versão do cache tem formato esperado', () => {
-  const sw = read('sw.js');
-  assert.match(sw, /e\.waitUntil\(caches\.open\(CACHE\)\.then\(c => c\.put\(r, copy\)\)\)/);
-  assert.match(sw, /const CACHE = 'nfl-shell-v\d+'/);
+test('service worker: a escrita no cache estende a vida do worker (waitUntil recebe a promessa da escrita)', async () => {
+  const handlers = {}; const written = []; const extended = [];
+  const cache = {put: async (req, res) => { written.push(req.url); }, addAll: async () => {}};
+  const sandbox = {
+    self: {addEventListener: (t, f) => { handlers[t] = f; }, skipWaiting: () => {}, clients: {claim: () => {}}},
+    caches: {open: async () => cache, match: async () => undefined, keys: async () => [], delete: async () => true},
+    fetch: async () => ({ok: true, clone() { return this; }}),
+    location: {origin: 'http://site.test'}, URL, Response: {error: () => 'erro'}
+  };
+  vm.runInNewContext(read('sw.js'), sandbox);
+  let responded;
+  handlers.fetch({request: {method: 'GET', url: 'http://site.test/js/app.js', mode: 'cors'}, respondWith: p => { responded = p; }, waitUntil: p => extended.push(p)});
+  assert.ok(responded, 'respondeu ao arquivo do próprio site');
+  await responded; await Promise.all(extended);
+  assert.equal(extended.length, 1, 'waitUntil recebeu a escrita no cache');
+  assert.deepEqual(written, ['http://site.test/js/app.js']);
+  // Arquivos de fora (ESPN, fontes) nunca passam pelo worker.
+  let outside = false;
+  handlers.fetch({request: {method: 'GET', url: 'https://site.api.espn.com/x', mode: 'cors'}, respondWith: () => { outside = true; }, waitUntil() {}});
+  assert.equal(outside, false);
+});
+test('service worker: a versão do cache tem o formato esperado', () => {
+  assert.match(read('sw.js'), /const CACHE = 'nfl-shell-v\d+'/);
 });
 test('service worker: todo módulo do site está na lista de arquivos guardados', () => {
   const sw = read('sw.js');

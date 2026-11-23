@@ -29,7 +29,8 @@ js/demo.js        dados de exemplo (só dev)
 ## Testes
 
 ```bash
-npm install      # instala o Playwright e liga o portão do git push
+npm install                     # dependências e liga o portão do git push
+npx playwright install chromium # navegador dos testes de tela (uma vez)
 npm test         # unitários (rápido, sem rede)
 npm run test:e2e # telas no navegador (Playwright), com a ESPN simulada
 npm run validate # os dois; roda sozinho antes de cada git push

@@ -65,10 +65,10 @@ const SPECIAL = {STATUS_POSTPONED: 'Adiado', STATUS_CANCELED: 'Cancelado', STATU
   STATUS_DELAYED: 'Atrasado', STATUS_RAIN_DELAY: 'Atrasado pela chuva', STATUS_SUSPENDED: 'Suspenso', STATUS_FORFEIT: 'W.O.'};
 export const dayLabel = d => validDate(d) ? cap(fmtDay.format(d)) : 'Data a definir';
 export const fullLabel = d => validDate(d) ? cap(fmtFull.format(d)) : 'A definir';
-// Rótulo do período: 1º Q … 4º Q, Prorrog., 2ª prorrog.
-export const periodLabel = q => !q ? '' : q <= 4 ? `${q}º Q` : q === 5 ? 'Prorrog.' : `${q - 4}ª prorrog.`;
+// Rótulo do período: 1º Q … 4º Q, OT, OT2 (o mesmo usado no cabeçalho do placar por quarto).
+export const periodLabel = q => !q ? '' : q <= 4 ? `${q}º Q` : q === 5 ? 'OT' : `OT${q - 4}`;
 export function statusHTML(g, long){
-  if (SPECIAL[g.status]) return `<span class="status">${SPECIAL[g.status]}</span>`;
+  if (Object.hasOwn(SPECIAL, g.status)) return `<span class="status">${SPECIAL[g.status]}</span>`;
   if (g.state === 'in') return `<span class="status live">${esc(tr(g.detail))}</span>`;
   if (g.state === 'post') return `<span class="status">${/OT/.test(g.detail) ? 'Final, prorrogação' : 'Final'}</span>`;
   if (!validDate(g.date)) return '<span class="status">Horário a definir</span>';

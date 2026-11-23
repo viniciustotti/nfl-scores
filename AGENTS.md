@@ -9,8 +9,9 @@ Site estático (HTML, CSS e JavaScript puro, sem build) que mostra os jogos da N
 - `js/views/*.js`: telas (lista, detalhe, classificação). `js/app.js`: estado, rotas por hash, polling. `js/demo.js`: dados de exemplo só para desenvolvimento (`?demo=1`), nunca como alternativa a um erro.
 
 ## Comandos (Node 22 ou mais novo)
+- Primeira vez: `npm install` e `npx playwright install chromium`.
 - `npm test`: testes unitários (`node --test`, sem dependências). `npm run test:e2e`: testes de tela com Playwright. `npm run validate`: os dois.
-- O `git push` roda `npm run validate` sozinho (`.githooks/pre-push`; o `npm install` liga isso). Teste falhando = push cancelado.
+- O `git push` roda `npm run validate` sozinho (`.githooks/pre-push`; o `npm install` liga isso). Teste falhando = push cancelado. O CI do GitHub roda o mesmo, mas o Pages publica da `main` sem esperar por ele: o portão que vale é o local.
 - Os testes nunca chamam a ESPN: usam dados reais guardados em `tests/fixtures/` (reduzidos aos campos usados). Para renovar, baixe novas respostas e reduza do mesmo jeito; confira os testes depois.
 
 ## Regras do projeto

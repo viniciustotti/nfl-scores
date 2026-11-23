@@ -1,6 +1,24 @@
 #!/bin/sh
 # Mesmo portão do `npm run validate`: código com teste falhando não sobe.
 # (Escape só em emergência e com o dono sabendo: git push --no-verify.)
+
+# Push que só apaga branch ou tag não tem código para testar.
+zero=0000000000000000000000000000000000000000
+only_deletes=1
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$local_sha" != "$zero" ] && only_deletes=0
+done
+[ "$only_deletes" = 1 ] && exit 0
+
+if [ ! -d node_modules ]; then
+  echo "pre-push: faltam as dependências. Rode: npm install && npx playwright install chromium" >&2
+  exit 1
+fi
+if ! node -e "import('@playwright/test').then(m => process.exit(require('node:fs').existsSync(m.chromium.executablePath()) ? 0 : 1)).catch(() => process.exit(1))" 2>/dev/null; then
+  echo "pre-push: falta o navegador dos testes de tela. Rode: npx playwright install chromium" >&2
+  exit 1
+fi
+
 echo "pre-push: rodando npm run validate..."
 if ! npm run validate; then
   echo "pre-push: testes falharam; push cancelado." >&2
