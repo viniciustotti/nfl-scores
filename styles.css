@@ -96,3 +96,17 @@ details[open].card summary h3::after{content:" ▴"}
 .pt td:first-child,.pt th:first-child{position:sticky;left:0;background:var(--card);padding-left:0}
 .pt .num{color:var(--muted);font-size:12px}
 .pt tr.tot td{font-weight:600;border-top:1px solid var(--muted)}
+
+.views{display:flex;gap:4px}
+.views a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600}
+.views a.on{color:var(--ink);background:var(--card);border:1px solid var(--line)}
+body[data-view=standings] .week{display:none}
+.seg + .seg{margin-top:8px}
+.st th,.st td{padding:8px 9px}
+.st td:first-child,.st th:first-child{position:sticky;left:0;background:var(--card);padding-left:0}
+.st .tm{display:inline-flex;align-items:center;gap:8px}
+.st .tm .logo{width:24px;height:24px;font-size:9px}
+.st .tm b{font:700 18px "Barlow Condensed",sans-serif}
+.st .seed{color:var(--muted);min-width:1.4em;text-align:right;font-size:13px}
+.st tr.me td{background:color-mix(in srgb,var(--accent) 15%,var(--card))}
+.st tr.cut td{border-top:2px dashed var(--muted)}

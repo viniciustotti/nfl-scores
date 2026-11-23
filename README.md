@@ -1,6 +1,6 @@
 # NFL Scores
 
-Site estático para acompanhar os jogos da NFL: o time favorito (Seahawks por padrão) no topo, lista da semana e detalhes por jogo (placar por quarto, pontuações, líderes, estatísticas e drives) e uma aba *Jogadores* com passe, corrida, recepção, defesa (sacks), interceptações, fumbles, chute e punt. Sem backend, sem chave de API e sem build. Veja [SPEC.md](SPEC.md).
+Site estático para acompanhar os jogos da NFL: o time favorito (Seahawks por padrão) no topo, lista da semana e detalhes por jogo (placar por quarto, pontuações, líderes, estatísticas e drives) uma aba *Jogadores* e a tela *Tabelas* (classificação por divisão ou conferência, com a linha de playoffs) com passe, corrida, recepção, defesa (sacks), interceptações, fumbles, chute e punt. Sem backend, sem chave de API e sem build. Veja [SPEC.md](SPEC.md).
 
 ## Rodar localmente
 
@@ -22,6 +22,7 @@ js/app.js         bootstrap, roteamento por hash, polling, semanas
 js/api.js         único ponto de contato com a ESPN + normalização
 js/util.js        constantes (times, rótulos), datas, helpers de HTML
 js/views/list.js  lista de jogos     js/views/game.js  detalhe do jogo
+js/views/standings.js  tabelas (#standings)
 js/demo.js        dados de exemplo (só dev)
 ```
 

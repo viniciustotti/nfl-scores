@@ -1,21 +1,25 @@
 // Bootstrap, roteamento por hash, polling e navegação de semanas.
 import {$, TEAMS, POST_WEEKS, store, applyAccent, installLogoFallback} from './util.js';
-import {getScoreboard, getGame, enableDemo} from './api.js';
+import {getScoreboard, getGame, getStandings, enableDemo} from './api.js';
 import {listView} from './views/list.js';
 import {gameView} from './views/game.js';
+import {standingsView} from './views/standings.js';
 
 const app = $('#app');
 const S = {
   demo: false, fav: store.get('favTeam', 'SEA'),
   week: null, type: null, year: null, games: [], bye: [], loaded: false,
-  view: 'list', gameId: null, detail: null, tab: 'game', pteam: null,
+  view: 'list', gameId: null, detail: null, tab: 'game', pteam: null, standings: null, sview: 'div', sconf: null,
   error: false, timer: null, req: 0, fromList: false, listY: 0
 };
 
 // ================= Render =================
 function render({keepScroll = true} = {}){
   const y = window.scrollY, k = document.activeElement?.dataset?.k;   // preserva rolagem e foco do teclado
-  app.innerHTML = S.view === 'game' ? gameView(S) : listView(S);
+  app.innerHTML = S.view === 'game' ? gameView(S) : S.view === 'standings' ? standingsView(S) : listView(S);
+  document.body.dataset.view = S.view;
+  $('#nav-games').classList.toggle('on', S.view !== 'standings'); $('#nav-st').classList.toggle('on', S.view === 'standings');
+  $('#nav-games').toggleAttribute('aria-current', S.view !== 'standings'); $('#nav-st').toggleAttribute('aria-current', S.view === 'standings');
   if (keepScroll) window.scrollTo(0, y);   // o polling não pode jogar a página para o topo
   if (k) app.querySelector(`[data-k="${k}"]`)?.focus({preventScroll: true});
 }
@@ -44,6 +48,10 @@ async function refresh(){
       const id = S.gameId, detail = await getGame(id);
       if (req !== S.req || id !== S.gameId) return;
       S.detail = detail;
+    } else if (S.view === 'standings') {
+      const st = await getStandings();
+      if (req !== S.req) return;
+      S.standings = st;
     } else if (!await loadList(req)) return;
     S.error = false;
   } catch (e) {
@@ -57,7 +65,7 @@ async function refresh(){
 function schedule(){
   clearTimeout(S.timer);
   if (document.hidden) return;
-  const list = S.view === 'game' ? (S.detail ? [S.detail.game] : []) : S.games, now = Date.now();
+  const list = S.view === 'game' ? (S.detail ? [S.detail.game] : []) : S.view === 'standings' ? [] : S.games, now = Date.now();
   const ms = S.error ? 60000
     : list.some(g => g.state === 'in') ? 30000
     : list.some(g => g.state === 'pre' && g.date - now < 2 * 3600e3 && g.date - now > -3600e3) ? 300000 : 0;
@@ -86,6 +94,10 @@ function route(){
     if (S.view === 'list') S.listY = window.scrollY;
     S.view = 'game'; S.gameId = m[1]; S.detail = null; S.error = false; S.tab = 'game'; S.pteam = null;
     render({keepScroll: false}); window.scrollTo(0, 0); refresh();
+  } else if (location.hash === '#standings') {
+    if (S.view === 'list') S.listY = window.scrollY;
+    S.view = 'standings'; S.detail = null; S.error = false;
+    render({keepScroll: false}); window.scrollTo(0, 0); refresh();
   } else {
     S.view = 'list'; S.detail = null; S.error = false;
     render({keepScroll: false}); window.scrollTo(0, S.listY); refresh();
@@ -106,6 +118,9 @@ app.addEventListener('click', e => {
   const tb = e.target.closest('[data-tab]'), pt = e.target.closest('[data-pteam]');
   if (tb) { S.tab = tb.dataset.tab; render(); }
   if (pt) { S.pteam = pt.dataset.pteam; render(); }
+  const sv = e.target.closest('[data-sview]'), sc = e.target.closest('[data-sconf]');
+  if (sv) { S.sview = sv.dataset.sview; render(); }
+  if (sc) { S.sconf = sc.dataset.sconf; render(); }
 });
 window.addEventListener('hashchange', route);
 document.addEventListener('visibilitychange', () => { if (document.hidden) clearTimeout(S.timer); else refresh(); });

@@ -24,10 +24,25 @@ export const DEMO = (() => {
     return {id, date, status:{period, type:{state, shortDetail:detail}}, venue:{fullName:venue}, broadcasts:[{names:[tv]}],
       situation:poss ? {possession:poss, downDistanceText:dd} : undefined, competitors:[c(hm, hr, hs, 'home'), c(aw, ar, as, 'away')]};
   };
+  const ri0 = (R, a, b) => a + Math.floor(R() * (b - a + 1));
   const rng = a => () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
   const split = s => { let n7 = Math.floor(s / 7), r = s - 7 * n7; while (r % 3 && n7 > 0) { n7--; r += 7; }
     return [...Array(n7).fill(7), ...(r % 3 === 0 ? Array(r / 3).fill(3) : [r])].filter(Boolean); };
   return {
+    standings(){
+      const D = {'AFC East':'BUF MIA NE NYJ','AFC North':'BAL CIN CLE PIT','AFC South':'HOU IND JAX TEN','AFC West':'DEN KC LV LAC',
+        'NFC East':'DAL NYG PHI WSH','NFC North':'CHI DET GB MIN','NFC South':'ATL CAR NO TB','NFC West':'ARI LAR SF SEA'};
+      const R = rng(2026), conf = {AFC:[], NFC:[]};
+      const divs = Object.entries(D).map(([name, ab]) => ({name, teams:ab.split(' ').map(a => { const w = ri0(R, 2, 9), l = 10 - w;
+        const t = {a, w, l, pct:w / 10, pf:ri0(R, 160, 300), pa:ri0(R, 160, 300)}; conf[name.slice(0, 3)].push(t); return t; }).sort((x, y) => y.pct - x.pct)}));
+      Object.values(conf).forEach(ts => { const lead = new Set(divs.filter(d => d.teams[0] && ts.includes(d.teams[0])).map(d => d.teams[0]));
+        [...ts].sort((x, y) => (lead.has(y) - lead.has(x)) || (y.pct - x.pct)).forEach((t, i) => { t.seed = i + 1; }); });
+      const entry = t => ({team:{id:t.a, abbreviation:t.a, shortDisplayName:TEAMS[t.a][0], logos:[{href:`https://a.espncdn.com/i/teamlogos/nfl/500/${t.a.toLowerCase()}.png`}]},
+        stats:Object.entries({overall:`${t.w}-${t.l}`, winPercent:t.pct.toFixed(3).slice(1), pointsFor:t.pf, pointsAgainst:t.pa, differential:(t.pf - t.pa >= 0 ? '+' : '') + (t.pf - t.pa),
+          streak:(t.w > 5 ? 'W' : 'L') + ri0(R, 1, 4), Home:'3-2', Road:'2-3', 'vs. Div.':'2-1', 'vs. Conf.':'5-3', playoffSeed:t.seed}).map(([name, v]) => ({name, displayValue:String(v)}))});
+      return {season:{year:YEAR, displayName:String(YEAR)}, children:['AFC', 'NFC'].map(c => ({abbreviation:c, name:c, children:divs.filter(d => d.name.startsWith(c))
+        .map(d => ({name:d.name, standings:{entries:d.teams.map(entry)}}))}))};
+    },
     scoreboard({type, week} = {}){
       if ((week && week !== WEEK) || (type && type !== 2)) return {events:[], week:{number:week}, season:{type, year:YEAR}};
       return {events:G.map(r => { const c = comp(r); return {id:c.id, date:c.date, status:c.status, competitions:[c]}; }),

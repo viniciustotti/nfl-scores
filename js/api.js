@@ -3,6 +3,7 @@
 import {TEAMS, STAT_LABELS, LEADER_CATS, PLAYER_CATS} from './util.js';
 
 const API = 'https://site.api.espn.com/apis/site/v2/sports/football/nfl';
+const STANDINGS_API = 'https://site.api.espn.com/apis/v2/sports/football/nfl/standings';   // note: /apis/v2 (sem /site)
 
 // Modo demo: só para desenvolvimento (#demo ou ?demo=1). Nunca é ativado sozinho por uma falha de rede.
 let demo = null;
@@ -100,6 +101,19 @@ function normDetail(s, id){
   return {game: g, plays, stats, leaders, drives, players};
 }
 
+function normStanding(e){
+  const t = e.team || {}, st = TEAMS[t.abbreviation] || [], v = {};
+  (e.stats || []).forEach(s => { v[s.name] = s.displayValue ?? String(s.value ?? ''); });
+  return {
+    id: String(t.id ?? t.abbreviation), abbr: t.abbreviation || '?', name: t.shortDisplayName || t.name || st[0] || '',
+    logo: t.logos?.[0]?.href || '', color: '#' + (st[1] || '555555'),
+    seed: Number(v.playoffSeed) || 99,
+    record: v.overall || '', pct: v.winPercent || '', pf: v.pointsFor || '', pa: v.pointsAgainst || '',
+    diff: v.differential || v.pointDifferential || '', streak: v.streak || '',
+    home: v.Home || '', road: v.Road || '', div: v['vs. Div.'] || '', conf: v['vs. Conf.'] || ''
+  };
+}
+
 // ================= API pública =================
 // Devolve {games, week, type, year, bye}. Sem argumentos: semana atual.
 export async function getScoreboard({type, week, year} = {}){
@@ -117,4 +131,16 @@ export async function getScoreboard({type, week, year} = {}){
 export async function getGame(id){
   const raw = demo ? demo.summary(id) : await getJSON(API + '/summary?event=' + encodeURIComponent(id));
   return normDetail(raw, id);
+}
+
+// Classificação por conferência e divisão (uma requisição, level=3). Ordem das divisões: a da ESPN.
+export async function getStandings(){
+  const raw = demo ? demo.standings() : await getJSON(STANDINGS_API + '?level=3');
+  return {
+    season: raw.season?.displayName || raw.season?.year || '',
+    confs: (raw.children || []).map(c => ({
+      name: c.abbreviation || c.name,
+      divisions: (c.children || []).map(d => ({name: d.name, teams: (d.standings?.entries || []).map(normStanding)}))
+    }))
+  };
 }

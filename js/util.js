@@ -16,6 +16,8 @@ export const LEADER_CATS = [['passingYards','Passe'],['rushingYards','Corrida'],
 // Estatísticas por jogador (boxscore.players): [chave ESPN, título]. Retornos de kick/punt ficam de fora.
 export const PLAYER_CATS = [['passing','Passe'],['rushing','Corrida'],['receiving','Recepção'],['defensive','Defesa'],
   ['interceptions','Interceptações'],['fumbles','Fumbles'],['kicking','Chute'],['punting','Punt']];
+const DIV_PT = {East: 'Leste', North: 'Norte', South: 'Sul', West: 'Oeste'};
+export const divName = n => String(n).replace(/\b(East|North|South|West)\b/, m => DIV_PT[m]);   // "AFC East" -> "AFC Leste"
 export const POST_WEEKS = {1:'Wild Card',2:'Divisional',3:'Final de conferência',4:'Pro Bowl',5:'Super Bowl'};
 
 // ================= DOM e texto =================
