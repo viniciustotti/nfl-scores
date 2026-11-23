@@ -1,5 +1,5 @@
-// Tela da lista de jogos. Recebe o estado e devolve HTML.
-import {esc, cap, fmtDay, statusHTML, logo, loses, banner} from '../util.js';
+// Tela da lista de jogos: linhas densas (sem cartões); só o jogo do time favorito vira cartão.
+import {TEAMS, esc, cap, fmtDay, statusHTML, logo, loses, banner} from '../util.js';
 
 const isFav = (g, fav) => g.home.abbr === fav || g.away.abbr === fav;
 
@@ -14,36 +14,37 @@ export function arrange(games, fav){
   };
 }
 
-function row(t, g){
+function team(t, g){
   const poss = g.state === 'in' && g.poss && g.poss === t.id ? '<span class="poss" title="Posse de bola"></span>' : '';
-  return `<div class="row${loses(t, g) ? ' lose' : ''}">${logo(t)}<span class="abbr">${esc(t.abbr)}</span>
-    <span class="rec">${esc(t.record)}</span>${poss}<span class="score">${t.score ?? ''}</span></div>`;
+  return `<div class="tm${loses(t, g) ? ' lose' : ''}">${logo(t)}<span class="nm"><b class="abbr">${esc(t.abbr)}</b><span class="rec">${esc(t.record)}</span>${poss}</span><span class="sc">${t.score ?? ''}</span></div>`;
 }
 
-function card(g, fav){
-  const label = `${g.away.name} ${g.away.score ?? ''} x ${g.home.name} ${g.home.score ?? ''}`;
-  return `<a class="game${fav ? ' fav' : ''}" href="#game-${esc(g.id)}" aria-label="${esc(label)}">
-    ${fav ? '<span class="chip">Seu time</span>' : ''}${row(g.away, g)}${row(g.home, g)}
-    <div class="meta">${statusHTML(g, fav)}${g.state === 'in' && g.dd ? `<span>${esc(g.dd)}</span>` : ''}
-    ${fav && g.state !== 'in' && g.venue ? `<span>${esc(g.venue)}</span>` : ''}<span class="tv">${esc(g.tv)}</span></div></a>`;
+function game(g, fav){
+  const label = `${fav ? 'Seu time: ' : ''}${g.away.name} ${g.away.score ?? ''} x ${g.home.name} ${g.home.score ?? ''}`;
+  const extra = fav && g.state !== 'in' && g.venue ? `<span class="sub">${esc(g.venue)}</span>` : '';
+  return `<a class="g${fav ? ' fav' : ''}" href="#game-${esc(g.id)}" aria-label="${esc(label)}">
+    <span class="info">${statusHTML(g, fav)}${g.tv ? `<span class="sub">${esc(g.tv)}</span>` : ''}${extra}</span>
+    ${team(g.away, g)}${team(g.home, g)}${g.state === 'in' && g.dd ? `<span class="dd">${esc(g.dd)}</span>` : ''}</a>`;
 }
 
-function byDay(list, title){
+// Um título de bloco e, dentro dele, um subtítulo por dia (opcional) com as linhas daquele dia.
+function block(title, list, byDay){
+  if (!list.length) return '';
+  if (!byDay) return `<h2>${title}</h2><div class="rows">${list.map(g => game(g)).join('')}</div>`;
   const days = new Map();
   list.forEach(g => { const k = cap(fmtDay.format(g.date)); days.has(k) || days.set(k, []); days.get(k).push(g); });
-  return [...days].map(([d, gs]) => `<h2>${title} · ${esc(d)}</h2><div class="grid">${gs.map(g => card(g)).join('')}</div>`).join('');
+  return `<h2>${title}</h2>` + [...days].map(([d, gs]) => `<h3 class="day">${esc(d)}</h3><div class="rows">${gs.map(g => game(g)).join('')}</div>`).join('');
 }
 
 export function listView(S){
   if (!S.loaded) return banner(S) + '<div class="sk"></div><div class="sk"></div><div class="sk"></div>';
-  let h = banner(S);
+  const h = banner(S);
   if (!S.games.length) return h + '<p class="empty">Nenhum jogo nesta semana.</p>';
 
   const {fav, live, pre, post} = arrange(S.games, S.fav);
-  h += fav.length ? fav.map(g => card(g, true)).join('')
-    : `<div class="game fav"><span class="chip">Seu time</span><p style="margin:2px 0 0">${esc(S.fav)} ${S.bye.includes(S.fav)
-        ? 'está de folga' : 'não joga'} nesta semana.</p></div>`;
-  if (live.length) h += `<h2>Ao vivo</h2><div class="grid">${live.map(g => card(g)).join('')}</div>`;
-  h += byDay(pre, 'Próximos') + byDay(post, 'Finalizados');
-  return h + '<p class="foot">Dados: API pública (não oficial) da ESPN · horários no seu fuso.</p>';
+  const name = TEAMS[S.fav]?.[0] || S.fav;
+  const top = fav.length ? fav.map(g => game(g, true)).join('')
+    : `<p class="bye">Os ${esc(name)} ${S.bye.includes(S.fav) ? 'estão de folga' : 'não jogam'} nesta semana.</p>`;
+  return h + top + block('Ao vivo', live) + block('Próximos', pre, true) + block('Finalizados', post, true)
+    + '<p class="foot">Dados da API pública (não oficial) da ESPN. Horários no seu fuso.</p>';
 }

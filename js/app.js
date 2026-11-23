@@ -53,7 +53,7 @@ async function refresh(){
       if (req !== S.req) return;
       S.standings = st;
     } else if (!await loadList(req)) return;
-    S.error = false;
+    S.error = false; S.updatedAt = Date.now();
   } catch (e) {
     if (req !== S.req) return;
     S.error = true;

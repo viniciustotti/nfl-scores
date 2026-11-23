@@ -54,17 +54,22 @@ export function applyAccent(fav){
 export function tr(d){
   if (!d) return 'Ao vivo';
   if (/^halftime$/i.test(d)) return 'Intervalo';
-  let m = d.match(/^(\d+:\d+) - (\d)(?:st|nd|rd|th)$/); if (m) return `${m[2]}º Q · ${m[1]}`;
+  let m = d.match(/^(\d+:\d+) - (\d)(?:st|nd|rd|th)$/); if (m) return `${m[2]}º Q ${m[1]}`;
   m = d.match(/^End of (\d)(?:st|nd|rd|th)/i); if (m) return `Fim do ${m[1]}º Q`;
   return d.replace(/\bOT\b/, 'Prorrogação');
 }
 export function statusHTML(g, long){
   if (g.state === 'in') return `<span class="status live">${esc(tr(g.detail))}</span>`;
-  if (g.state === 'post') return `<span class="status">${/OT/.test(g.detail) ? 'Final · prorrogação' : 'Final'}</span>`;
+  if (g.state === 'post') return `<span class="status">${/OT/.test(g.detail) ? 'Final, prorrogação' : 'Final'}</span>`;
   const diff = g.date - Date.now();
   if (diff > 0 && diff < 2 * 3600e3) return `<span class="status">Começa em ${Math.max(1, Math.round(diff / 6e4))} min</span>`;
   return `<span class="status">${long ? cap(fmtFull.format(g.date)) : fmtTime.format(g.date)}</span>`;
 }
+
+// Cor do texto sobre um fundo de time (escuro ou branco, conforme a luminância) e distância entre duas cores.
+export const textOn = hex => lum(hex.replace('#', '')) > .3 ? '#0a1117' : '#ffffff';
+export const colorDist = (a, b) => { const p = h => [1, 3, 5].map(i => parseInt(h.replace('#', '').slice(i - 1, i + 1), 16));
+  const [x, y] = [p(a), p(b)]; return Math.hypot(x[0] - y[0], x[1] - y[1], x[2] - y[2]); };
 
 // Logo da ESPN; se não vier na resposta, usa o padrão do CDN. Se a imagem falhar, vira um círculo com a sigla.
 export const logoUrl = t => t.logo || `https://a.espncdn.com/i/teamlogos/nfl/500/${String(t.abbr).toLowerCase()}.png`;
@@ -80,13 +85,13 @@ export function installLogoFallback(){
   }, true);
 }
 
-// Time perdedor de um jogo já finalizado (fica com opacidade reduzida).
+// Time perdedor de um jogo já finalizado (texto em cinza, sem opacidade, para manter o contraste).
 export const loses = (t, g) => g.state === 'post' && !t.winner && (g.home.winner || g.away.winner);
 
 // Avisos no topo da tela: modo demo e erro de rede.
 export function banner(S){
   let h = '';
-  if (S.demo) h += `<p class="notice">Modo demo: <strong>dados de exemplo</strong> (jogos e placares inventados), só para desenvolvimento.</p>`;
-  if (S.error) h += `<p class="notice err">Não foi possível atualizar. Tentando novamente…</p>`;
+  if (S.demo) h += `<p class="notice" role="status">Modo demo: <strong>dados de exemplo</strong> (jogos e placares inventados), só para desenvolvimento.</p>`;
+  if (S.error) h += `<p class="notice err" role="status">${S.updatedAt ? `Mostrando dados de ${fmtTime.format(S.updatedAt)}. ` : ''}Não foi possível atualizar; tentando de novo…</p>`;
   return h;
 }
