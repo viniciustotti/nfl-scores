@@ -1,6 +1,6 @@
 {
-  "name": "NFL Placar",
-  "short_name": "NFL",
+  "name": "SEA Scores",
+  "short_name": "SEA Scores",
   "description": "Resultados e placares da NFL, com o seu time no topo.",
   "lang": "pt-BR",
   "start_url": "./",
