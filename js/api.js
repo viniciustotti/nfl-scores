@@ -26,7 +26,7 @@ function normTeam(c = {}){
     id: String(t.id ?? t.abbreviation), abbr: t.abbreviation || '?',
     name: t.shortDisplayName || t.name || st[0] || '',
     logo: t.logo || t.logos?.[0]?.href || '',
-    color: '#' + (t.color || st[1] || '555555'),
+    color: '#' + (t.color || st[1] || '555555'), alt: '#' + (t.alternateColor || st[2] || 'ffffff'),
     score: (c.score === undefined || c.score === '') ? null : Number(c.score?.value ?? c.score),
     record: recs[0]?.summary || recs[0]?.displayValue || '',
     winner: !!c.winner,
@@ -109,7 +109,7 @@ function normStanding(e){
     logo: t.logos?.[0]?.href || '', color: '#' + (st[1] || '555555'),
     seed: Number(v.playoffSeed) || 99,
     record: v.overall || '', pct: v.winPercent || '', pf: v.pointsFor || '', pa: v.pointsAgainst || '',
-    diff: v.differential || v.pointDifferential || '', streak: v.streak || '',
+    diff: v.differential || v.pointDifferential || '', streak: (v.streak || '').replace(/^W/, 'V').replace(/^L/, 'D').replace(/^T/, 'E'),   // W3 -> V3, L1 -> D1
     home: v.Home || '', road: v.Road || '', div: v['vs. Div.'] || '', conf: v['vs. Conf.'] || ''
   };
 }

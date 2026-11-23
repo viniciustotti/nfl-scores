@@ -1,112 +1,161 @@
 /*
-VOICE: placar de estádio — direto, números grandes, sem enfeite.
-IDEA: a faixa de placar da transmissão de TV.
-PICTURE: o card do seu time, grande, no topo, nas cores dele.
-COLOUR and TYPE: fundo neutro + cor do time favorito como destaque; Barlow Condensed em siglas e placares, Inter no texto.
-LAYOUT: coluna única no celular, grid de 2 colunas a partir de 720px.
+PROTÓTIPO (branch prototype/frontend-design).
+IDEIA: a faixa de placar da transmissão. Números grandes, texto em linhas, cartão só para o seu time.
+ACCENT: --accent é a cor do time favorito e só aparece onde "seu time" aparece (cartão, aviso de folga, linha na tabela).
+O jogo aberto usa as DUAS cores reais dos times da partida (hero).
+TIPOGRAFIA: Barlow Condensed para siglas, números e títulos; Inter para texto. Escala fechada: --fs-1 a --fs-7.
 */
 :root{color-scheme:light dark;
   --bg:light-dark(#eef1f3,#0a1117);--card:light-dark(#ffffff,#121c25);--ink:light-dark(#0d1820,#e7edf1);
-  --muted:light-dark(#5a6a76,#8c9ba7);--line:light-dark(#dbe1e6,#213040);--live:#e0353b;--accent:#69be28;--on-accent:#0a1117}
+  --muted:light-dark(#566670,#8c9ba7);--line:light-dark(#d5dce1,#213040);--live:#e0353b;--accent:#69be28;--on-accent:#0a1117;
+  --fs-1:.75rem;--fs-2:.875rem;--fs-3:1rem;--fs-4:1.25rem;--fs-5:2rem;--fs-6:3.5rem;--fs-7:clamp(3.25rem,14vw,6rem);
+  --display:"Barlow Condensed","Arial Narrow",sans-serif;--text:Inter,system-ui,sans-serif;
+  --w:720px;--pad:max(4vw,14px)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+body[data-view=game]{--w:880px}
+body[data-view=standings]{--w:960px}
 *{box-sizing:border-box;min-width:0}
-body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
-.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-.bar{max-width:1040px;margin:auto;display:flex;align-items:center;gap:10px;padding:8px max(4vw,14px);flex-wrap:wrap}
-.brand{font:700 28px/1 "Barlow Condensed",sans-serif;margin:0;display:flex;align-items:center;gap:8px}
-.brand i{width:12px;height:12px;border-radius:50%;background:var(--accent)}
-.week{display:flex;align-items:center;gap:4px;margin-inline-start:auto}
-.week span{font:600 19px "Barlow Condensed",sans-serif;min-width:8.5em;text-align:center;white-space:nowrap}
-button,select{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;min-height:44px;cursor:pointer}
-button{min-width:44px;font-size:20px}
-select{padding:0 10px;font-size:16px}
-:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-main{max-width:1040px;margin:auto;padding:16px max(4vw,14px) 48px}
-.notice{border:1px dashed var(--line);border-radius:12px;padding:10px 14px;color:var(--muted);font-size:14px;margin-bottom:14px}
-.notice.err{border-color:var(--live);color:var(--ink)}
-h2{font:600 20px "Barlow Condensed",sans-serif;margin:26px 0 10px;color:var(--muted)}
-.grid{display:grid;gap:12px;grid-template-columns:minmax(0,1fr)}
-@media(min-width:720px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.game{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
-a.game:hover{border-color:var(--muted)}
-.row{display:flex;align-items:center;gap:10px;padding:4px 0}
-.logo{width:32px;height:32px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 12px "Barlow Condensed",sans-serif;color:#fff;background:var(--tc,#555);object-fit:contain}
-img.logo{background:none}
-.abbr{font:700 22px/1 "Barlow Condensed",sans-serif}
-.rec{color:var(--muted);font-size:13px;white-space:nowrap}
-.poss{width:9px;height:9px;border-radius:50%;background:var(--accent);flex:none}
-.score{margin-inline-start:auto;font:700 30px/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums}
-.lose{opacity:.5}
-.meta{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-size:13px;color:var(--muted)}
-.meta .tv{margin-inline-start:auto}
-.status{font-weight:600;color:var(--ink);white-space:nowrap}
-.status.live{color:var(--live);display:inline-flex;align-items:center;gap:6px}
-.status.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite}
-@keyframes pulse{50%{opacity:.2}}
-.fav{background:color-mix(in srgb,var(--accent) 15%,var(--card));border:2px solid var(--accent);padding:16px 18px}
-.fav .abbr{font-size:32px}.fav .score{font-size:48px}.fav .logo{width:46px;height:46px;font-size:15px}
-.chip{display:inline-block;background:var(--accent);color:var(--on-accent);font-weight:600;font-size:12px;border-radius:99px;padding:2px 10px;margin-bottom:6px}
+body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs-3)/1.5 var(--text);overflow-x:clip}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+
+/* cabeçalho */
+.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:var(--w);margin:auto;display:flex;align-items:center;gap:6px 14px;padding:4px var(--pad);flex-wrap:wrap}
+.brand{font:700 var(--fs-5)/1 var(--display);margin:0}
+.views{display:flex;gap:4px}
+.views a{display:inline-flex;align-items:center;min-height:44px;padding:0 5px;color:var(--muted);text-decoration:none;font-weight:600;border-bottom:2px solid transparent}
+.views a.on{color:var(--ink);border-bottom-color:var(--ink)}
+.week{display:flex;align-items:center;gap:2px;margin-inline-start:auto}
+body[data-view=standings] .week,body[data-view=game] .week{visibility:hidden}
+.week span{font:600 var(--fs-4) var(--display);min-width:4.5em;text-align:center;white-space:nowrap}
+button,select{font:inherit;color:inherit;background:none;border:1px solid var(--line);border-radius:8px;min-height:44px;cursor:pointer}
+button{min-width:44px;font-size:var(--fs-4)}
+select{padding:0 10px;font-size:var(--fs-3);background:var(--card)}
+.week button{border-color:transparent}
+
+main{max-width:var(--w);margin:auto;padding:12px var(--pad) 56px}
+.notice{border-left:4px solid var(--muted);padding:6px 12px;color:var(--muted);font-size:var(--fs-2);margin:0 0 12px}
+.notice.err{border-left-color:var(--live);color:var(--ink)}
 .empty{color:var(--muted);padding:16px 0}
-.sk{height:120px;border-radius:14px;margin-bottom:12px;background:linear-gradient(90deg,var(--card),var(--line),var(--card));background-size:200% 100%;animation:sk 1.2s infinite linear}
+.foot{color:var(--muted);font-size:var(--fs-2);margin-top:32px}
+.sk{height:64px;border-radius:6px;margin-bottom:8px;background:linear-gradient(90deg,var(--card),var(--line),var(--card));background-size:200% 100%;animation:sk 1.2s infinite linear}
 @keyframes sk{to{background-position:-200% 0}}
+@keyframes pulse{50%{opacity:.2}}
 @media(prefers-reduced-motion:reduce){.status.live::before,.sk{animation:none}}
-.back{padding:0 14px;margin-bottom:12px;font-size:16px}
-.hero{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:10px;background:color-mix(in srgb,var(--accent) 10%,var(--card));border:1px solid var(--line);border-radius:16px;padding:20px 12px;text-align:center}
-.hero .t{display:grid;justify-items:center;gap:4px}
-.hero .logo{width:58px;height:58px;font-size:18px}
-.hero .abbr{font-size:30px}
-.big{font:700 clamp(40px,11vw,68px)/1 "Barlow Condensed",sans-serif;font-variant-numeric:tabular-nums;display:flex;gap:10px;align-items:center;justify-content:center}
-.big i{font-style:normal;color:var(--muted)}
-.mid{display:grid;justify-items:center;gap:6px;font-size:13px;color:var(--muted)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:14px}
-.card h3{margin:0 0 6px;font:600 20px "Barlow Condensed",sans-serif}
-.cols{display:grid;gap:0 14px;grid-template-columns:minmax(0,1fr)}
-@media(min-width:820px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* títulos */
+h2{font:600 var(--fs-4)/1.2 var(--display);margin:32px 0 0}
+.day{font:600 var(--fs-2) var(--text);color:var(--muted);margin:16px 0 4px}
+
+/* lista: linhas, sem cartões */
+.logo{width:28px;height:28px;flex:none;border-radius:50%;display:grid;place-items:center;font:700 var(--fs-1) var(--display);color:#fff;background:var(--tc,#555);object-fit:contain}
+img.logo{background:none}
+.g{display:grid;grid-template-columns:5.5rem minmax(0,1fr);column-gap:12px;align-items:center;padding:10px 0;border-top:1px solid var(--line);color:inherit;text-decoration:none}
+.g:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.g .info{grid-row:1 / span 3;align-self:start;display:grid;gap:2px;padding-top:4px;font-size:var(--fs-2)}
+.status{font-weight:600;color:var(--ink)}
+.status.live{color:var(--live);display:inline-flex;align-items:center;gap:6px}
+.status.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite;flex:none}
+.sub{color:var(--muted);font-size:var(--fs-1);line-height:1.3}
+.tm{display:grid;grid-template-columns:28px minmax(0,1fr) auto;align-items:center;gap:10px;padding:3px 0}
+.nm{display:flex;align-items:baseline;gap:8px}
+.abbr{font:700 var(--fs-4)/1 var(--display)}
+.rec{color:var(--muted);font-size:var(--fs-1);white-space:nowrap}
+.poss{width:8px;height:8px;border-radius:50%;background:var(--ink);flex:none;align-self:center}
+.sc{font:700 var(--fs-5)/1 var(--display);font-variant-numeric:tabular-nums}
+.lose .abbr,.lose .sc{color:var(--muted);font-weight:600}
+.dd{grid-column:2;color:var(--muted);font-size:var(--fs-2);padding-top:2px}
+
+/* o cartão do time favorito: o único cartão da lista */
+.g.fav{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent);border-radius:10px;padding:14px 16px;margin-bottom:4px}
+.g.fav .abbr{font-size:var(--fs-5)}.g.fav .sc{font-size:var(--fs-6)}
+.g.fav .tm{grid-template-columns:44px minmax(0,1fr) auto}.g.fav .logo{width:44px;height:44px}
+.bye{margin:0;padding:8px 12px;border-left:6px solid var(--accent);font-weight:600}
+
+/* detalhe do jogo */
+.back{padding:0 14px;margin:4px 0 12px;font-size:var(--fs-3)}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);border-radius:6px;overflow:hidden}
+.hero .side{display:grid;justify-items:center;align-content:center;gap:2px;padding:22px 10px;text-align:center}
+.hero .away{background:var(--ca);color:var(--ta)}
+.hero .home{background:var(--ch);color:var(--th)}
+.hero .logo{width:64px;height:64px;background:#fff;padding:7px;margin-bottom:6px}
+.hero .abbr{font-size:var(--fs-5)}
+.hero .nm{display:block;font-size:var(--fs-2)}
+.hero .rc{font:600 var(--fs-3) var(--display)}
+.mid{display:grid;justify-items:center;align-content:center;gap:6px;padding:16px 18px;background:#0a1117;color:#fff;font-size:var(--fs-2)}
+.mid .status{color:#fff}.mid .status.live{color:#ff6b6f}
+.big{font:700 var(--fs-7)/1 var(--display);font-variant-numeric:tabular-nums;display:flex;gap:12px;align-items:center;justify-content:center}
+.big i{font-style:normal;color:#8c9ba7;font-size:.5em}
+.big .lose{color:#8c9ba7}
+@media(max-width:480px){.hero .logo{width:44px;height:44px;padding:5px}.hero .side{padding:16px 6px}.mid{padding:12px 10px}.big{gap:6px}}
+
+/* abas discretas: texto + sublinhado */
+.tabs,.seg{display:flex;gap:20px}
+.tabs{margin-top:20px;border-bottom:1px solid var(--line)}
+.seg{margin-top:4px}
+.tabs button,.seg button{border:0;border-bottom:2px solid transparent;border-radius:0;min-width:0;padding:0 2px;min-height:44px;color:var(--muted);font:600 var(--fs-3) var(--text);margin-bottom:-1px}
+.seg button{font:600 var(--fs-4) var(--display)}
+.tabs button.on,.seg button.on{color:var(--ink);border-bottom-color:var(--ink)}
+
+/* seções planas (antes eram cartões) */
+.card{border-top:1px solid var(--line);padding-top:14px;margin-top:28px}
+.card h3{margin:0 0 8px;font:600 var(--fs-4) var(--display)}
+.cols{display:grid;gap:0 32px;grid-template-columns:minmax(0,1fr)}
+@media(min-width:960px){.cols{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .scroll{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
 th,td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
-th{color:var(--muted);font-weight:500;font-size:13px}
+th{color:var(--muted);font-weight:500;font-size:var(--fs-1)}
 tr:last-child td{border-bottom:0}
-td b{font-family:"Barlow Condensed",sans-serif;font-size:18px}
+td b{font:700 var(--fs-4) var(--display)}
+.ls{max-width:480px}
 .lead td{white-space:normal;text-align:left;vertical-align:top}
 .lead small{display:block;color:var(--muted)}
 .plays{list-style:none;margin:0;padding:0}
 .plays li{display:grid;grid-template-columns:4.6em minmax(0,1fr) auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:baseline}
 .plays li:last-child{border-bottom:0}
-.when{color:var(--muted);font-size:13px;white-space:nowrap}
-.sc{font:700 18px "Barlow Condensed",sans-serif;white-space:nowrap;font-variant-numeric:tabular-nums}
+.when{color:var(--muted);font-size:var(--fs-2);white-space:nowrap}
+.plays .sc{font-size:var(--fs-4)}
 dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0}
 dt{color:var(--muted)}dd{margin:0}
-.foot{color:var(--muted);font-size:13px;margin-top:28px}
 details.card summary{cursor:pointer;list-style:none;min-height:24px}
 details.card summary::-webkit-details-marker{display:none}
 details.card summary h3{display:inline;margin:0}
-details.card summary h3::after{content:" ▾";color:var(--muted);font-size:16px}
+details.card summary h3::after{content:" ▾";color:var(--muted);font-size:var(--fs-3)}
 details[open].card summary h3::after{content:" ▴"}
 .drives{margin-top:8px}
-.res{color:var(--muted);font-size:13px;white-space:nowrap;text-align:right}
+.res{color:var(--muted);font-size:var(--fs-2);white-space:nowrap;text-align:right}
 .res.scored{color:var(--ink);font-weight:600}
 
-.tabs,.seg{display:flex;gap:6px;margin-top:14px}
-.tabs button,.seg button{flex:1;font:600 16px Inter,system-ui,sans-serif;min-height:44px}
-.seg{margin-bottom:0}.seg button{font-family:"Barlow Condensed",sans-serif;font-size:20px}
-.tabs button.on,.seg button.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+/* jogadores e classificação */
 .pt th,.pt td{padding:8px 10px}
-.pt td:first-child,.pt th:first-child{position:sticky;left:0;background:var(--card);padding-left:0}
-.pt .num{color:var(--muted);font-size:12px}
+.pt td:first-child,.pt th:first-child{position:sticky;left:0;background:var(--bg);padding-left:0}
+.pt .num{color:var(--muted);font-size:var(--fs-1)}
 .pt tr.tot td{font-weight:600;border-top:1px solid var(--muted)}
+.stand th,.stand td{padding:8px 10px}
+.stand td:first-child,.stand th:first-child{position:sticky;left:0;background:var(--bg);padding-left:0}
+.stand{table-layout:fixed}
+.stand th:first-child{width:6.5rem}
+.stand .s{color:var(--muted)}
+@media(max-width:719px){.stand .s{display:none}}
+.tm2{display:inline-flex;align-items:center;gap:8px}
+.tm2 .logo{width:24px;height:24px;font-size:var(--fs-1)}
+.tm2 b{font:700 var(--fs-4) var(--display)}
+.seed{color:var(--muted);min-width:1.4em;text-align:right;font-size:var(--fs-2)}
+.stand tr.me td{background:color-mix(in srgb,var(--accent) 16%,var(--bg))}
+.stand tr.cut td{border-top:2px dashed var(--muted)}
 
-.views{display:flex;gap:4px}
-.views a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600}
-.views a.on{color:var(--ink);background:var(--card);border:1px solid var(--line)}
-body[data-view=standings] .week{display:none}
-.seg + .seg{margin-top:8px}
-.st th,.st td{padding:8px 9px}
-.st td:first-child,.st th:first-child{position:sticky;left:0;background:var(--card);padding-left:0}
-.st .tm{display:inline-flex;align-items:center;gap:8px}
-.st .tm .logo{width:24px;height:24px;font-size:9px}
-.st .tm b{font:700 18px "Barlow Condensed",sans-serif}
-.st .seed{color:var(--muted);min-width:1.4em;text-align:right;font-size:13px}
-.st tr.me td{background:color-mix(in srgb,var(--accent) 15%,var(--card))}
-.st tr.cut td{border-top:2px dashed var(--muted)}
+/* celular: cabeçalho em 2 linhas e sem fixar no topo; cartão do favorito com o status em cima */
+@media(max-width:600px){
+  .top{position:static}
+  .week{margin-inline-start:0}
+  #fav{margin-inline-start:auto;max-width:9.25rem}
+  .week span{min-width:3.8em}
+  .week button{min-width:40px}
+  body[data-view=game] .week,body[data-view=standings] .week{display:none}
+  body[data-view=game] #fav,body[data-view=standings] #fav{margin-inline-start:auto}
+  .g.fav{grid-template-columns:1fr}
+  .g.fav .info{grid-row:auto;display:flex;flex-wrap:wrap;gap:2px 10px;padding-top:0;margin-bottom:6px}
+  .g.fav .dd{grid-column:1}
+}

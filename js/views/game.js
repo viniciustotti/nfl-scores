@@ -1,16 +1,23 @@
 // Tela de detalhes do jogo (#game-{id}). Recebe o estado e devolve HTML.
-import {esc, cap, fmtFull, statusHTML, logo, loses, banner} from '../util.js';
+import {esc, cap, fmtFull, statusHTML, logo, loses, banner, textOn, colorDist} from '../util.js';
 
-function heroTeam(t, g){
-  return `<div class="t${loses(t, g) ? ' lose' : ''}">${logo(t)}<span class="abbr">${esc(t.abbr)}</span>
-    <span class="rec">${esc(t.name)}${t.record ? ' · ' + esc(t.record) : ''}</span></div>`;
+function heroTeam(t, g, cls){
+  return `<div class="side ${cls}">${logo(t)}<b class="abbr">${esc(t.abbr)}</b><span class="nm">${esc(t.name)}</span><span class="rc">${esc(t.record)}</span></div>`;
+}
+function hero(g, pre){
+  const a = g.away.color; let h = g.home.color;
+  if (colorDist(a, h) < 90) h = g.home.alt || h;
+  const sc = (t) => `<span class="${loses(t, g) ? 'lose' : ''}">${t.score ?? 0}</span>`;
+  return `<section class="hero" style="--ca:${esc(a)};--ta:${textOn(a)};--ch:${esc(h)};--th:${textOn(h)}">${heroTeam(g.away, g, 'away')}<div class="mid">
+    <div class="big">${pre ? '<i>×</i>' : `${sc(g.away)}<i>–</i>${sc(g.home)}`}</div>
+    ${statusHTML(g, true)}${g.state === 'in' && g.dd ? `<span>${esc(g.dd)}</span>` : ''}</div>${heroTeam(g.home, g, 'home')}</section>`;
 }
 
 function linescore(g){
   const n = Math.max(4, g.home.linescores.length, g.away.linescores.length);
   const qs = [...Array(n)].map((_, i) => i < 4 ? i + 1 : 'OT');
   const line = t => `<tr><td><b>${esc(t.abbr)}</b></td>${qs.map((_, i) => `<td>${esc(t.linescores[i] ?? '–')}</td>`).join('')}<td><b>${t.score ?? 0}</b></td></tr>`;
-  return `<div class="card"><h3>Placar por quarto</h3><div class="scroll"><table><thead><tr><th>Time</th>${qs.map(q => `<th>${q}</th>`).join('')}<th>T</th></tr></thead>
+  return `<div class="card"><h3>Placar por quarto</h3><div class="scroll"><table class="ls"><thead><tr><th>Time</th>${qs.map(q => `<th>${q}</th>`).join('')}<th>T</th></tr></thead>
     <tbody>${line(g.away)}${line(g.home)}</tbody></table></div></div>`;
 }
 
@@ -47,14 +54,12 @@ export function gameView(S){
   if (!d) return top + '<div class="sk" style="height:180px"></div><div class="sk"></div>';
   const g = d.game, pre = g.state === 'pre';
 
-  let h = top + `<section class="hero">${heroTeam(g.away, g)}<div class="mid">
-    <div class="big">${pre ? '<i>×</i>' : `<span>${g.away.score ?? 0}</span><i>–</i><span>${g.home.score ?? 0}</span>`}</div>
-    ${statusHTML(g, true)}${g.state === 'in' && g.dd ? `<span>${esc(g.dd)}</span>` : ''}</div>${heroTeam(g.home, g)}</section>`;
+  let h = top + hero(g, pre);
 
   // Antes do jogo: só header, info e records. As seções vazias não aparecem.
   const hasPlayers = !pre && (d.players.home.length || d.players.away.length);
   const tab = hasPlayers && S.tab === 'players' ? 'players' : 'game';
-  if (hasPlayers) h += `<div class="tabs" role="tablist">${[['game', 'Jogo'], ['players', 'Jogadores']].map(([k, l]) =>
+  if (hasPlayers) h += `<div class="tabs" role="tablist">${[['game', 'Resumo'], ['players', 'Jogadores']].map(([k, l]) =>
     `<button role="tab" data-k="tab-${k}" data-tab="${k}" aria-selected="${k === tab}" class="${k === tab ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   if (tab === 'players') return h + playersView(S, d);
   if (!pre) {
