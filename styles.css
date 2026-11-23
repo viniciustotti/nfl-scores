@@ -23,11 +23,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs-3)/1.5 var(--t
 /* faixa de abertura com o logotipo (rola com a página) e selo do app na barra fixa */
 .masthead{max-width:var(--w);margin:auto;padding:16px var(--pad) 8px}
 .masthead h1{margin:0;line-height:0}
-.masthead a{display:inline-block}
-.masthead img{height:80px;width:auto;display:block}
-.mark{display:inline-flex;align-items:center;min-height:44px}
-.mark img{width:32px;height:32px;border-radius:8px;display:block}
-@media(max-width:600px){.masthead img{height:64px}}
+.masthead a{display:block}
+.masthead img{height:88px;width:auto;display:block;margin:0 auto}
+@media(max-width:600px){.masthead img{height:68px}}
 .views{display:flex;gap:4px}
 .views a{display:inline-flex;align-items:center;min-height:44px;padding:0 5px;color:var(--muted);text-decoration:none;font-weight:600;border-bottom:2px solid transparent}
 .views a.on{color:var(--ink);border-bottom-color:var(--ink)}
