@@ -20,7 +20,14 @@ body{margin:0;background:var(--bg);color:var(--ink);font:var(--fs-3)/1.5 var(--t
 /* cabeçalho */
 .top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
 .bar{max-width:var(--w);margin:auto;display:flex;align-items:center;gap:6px 14px;padding:4px var(--pad);flex-wrap:wrap}
-.brand{font:700 var(--fs-5)/1 var(--display);margin:0}
+/* faixa de abertura com o logotipo (rola com a página) e selo do app na barra fixa */
+.masthead{max-width:var(--w);margin:auto;padding:16px var(--pad) 8px}
+.masthead h1{margin:0;line-height:0}
+.masthead a{display:inline-block}
+.masthead img{height:80px;width:auto;display:block}
+.mark{display:inline-flex;align-items:center;min-height:44px}
+.mark img{width:32px;height:32px;border-radius:8px;display:block}
+@media(max-width:600px){.masthead img{height:64px}}
 .views{display:flex;gap:4px}
 .views a{display:inline-flex;align-items:center;min-height:44px;padding:0 5px;color:var(--muted);text-decoration:none;font-weight:600;border-bottom:2px solid transparent}
 .views a.on{color:var(--ink);border-bottom-color:var(--ink)}
