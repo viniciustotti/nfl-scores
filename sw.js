@@ -1,6 +1,6 @@
 // Service worker mínimo: deixa o site instalável e abre a "casca" mesmo sem rede.
 // Os dados (ESPN) e as fontes NUNCA passam por aqui: placar velho seria pior que erro.
-const CACHE = 'nfl-shell-v4';
+const CACHE = 'nfl-shell-v5';
 const SHELL = ['./', './index.html', './styles.css', './manifest.webmanifest',
   './js/app.js', './js/api.js', './js/util.js', './js/logic.js', './js/demo.js', './js/views/list.js', './js/views/game.js', './js/views/standings.js',
   './icons/icon-192.png', './icons/icon-512.png', './img/logo-light.png', './img/logo-dark.png'];

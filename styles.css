@@ -150,6 +150,10 @@ details[open].card summary h3::after{content:" ▴"}
 .stand tr.me td{background:color-mix(in srgb,var(--accent) 16%,var(--bg))}
 .stand tr.cut td{border-top:2px dashed var(--muted)}
 
+/* Telas de toque (celular, deitado ou não, e tablet): fundo sólido, sem blur. No Chrome para Android a camada
+   que o blur cria às vezes não é pintada, e a barra some deixando só o espaço até a próxima repintura. */
+@media(hover:none){.top{backdrop-filter:none;background:var(--bg)}}
+
 /* celular: cabeçalho em 2 linhas e sem fixar no topo; cartão do favorito com o status em cima */
 @media(max-width:600px){
   .top{position:static}
